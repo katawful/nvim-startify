@@ -35,7 +35,6 @@ local function is_buf_empty(buf)
 end
 _2amodule_locals_2a["is-buf-empty"] = is_buf_empty
 local function on_vimenter()
-  print(get_arglist())
   if ((get_arglist() == 0) and is_buf_empty(0)) then
     local function _3_()
       return vim.g.startify_session_autoload
@@ -49,19 +48,14 @@ local function on_vimenter()
       end
     end
     if (_3_() and _4_()) then
-      print("HUH")
-      vim.cmd.source("Session.vim")
-      return print("HUH")
+      return vim.cmd.source("Session.vim")
     elseif ((vim.g.startify_disable_at_vimenter == 0) or (vim.g.startify_disable_at_vimenter == nil)) then
-      print("WHAT")
-      render.init()
-      return print("WHAT")
+      return render.init()
     else
       return nil
     end
   else
-    print("what")
-    return print("NOT EMPTY")
+    return nil
   end
 end
 _2amodule_2a["on-vimenter"] = on_vimenter
