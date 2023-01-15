@@ -15,7 +15,7 @@ local autocmd = autoload("nvim-startify.utils.autocmd")
 do end (_2amodule_locals_2a)["autocmd"] = autocmd
 local function init()
   print("HI")
-  autocmd["on-vimenter"]()
+  autocmd.init()
   return print("BYE")
 end
 _2amodule_2a["init"] = init

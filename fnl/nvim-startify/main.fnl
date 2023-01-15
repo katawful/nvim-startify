@@ -6,5 +6,5 @@
 
 (defn init []
   (print "HI")
-  (autocmd.on-vimenter)
+  (autocmd.init)
   (print "BYE"))
