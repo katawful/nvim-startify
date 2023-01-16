@@ -11,9 +11,10 @@ do
   _2amodule_locals_2a = (_2amodule_2a)["aniseed/locals"]
 end
 local autoload = (require("nvim-startify.aniseed.autoload")).autoload
-local file, render, _, _0, _1 = autoload("nvim-startify.utils.file"), autoload("nvim-startify.render.init"), nil, nil, nil
+local file, render, session_write, _, _0, _1 = autoload("nvim-startify.utils.file"), autoload("nvim-startify.render.init"), autoload("nvim-startify.session.write"), nil, nil, nil
 _2amodule_locals_2a["file"] = file
 _2amodule_locals_2a["render"] = render
+_2amodule_locals_2a["session-write"] = session_write
 _2amodule_locals_2a["_"] = _1
 _2amodule_locals_2a["_"] = _1
 _2amodule_locals_2a["_"] = _1
@@ -78,8 +79,24 @@ local function on_vimenter()
   return update_oldfiles()
 end
 _2amodule_2a["on-vimenter"] = on_vimenter
-local function init()
+local function on_vimleavepre()
   local function _10_()
+    local result_2_auto = vim.fn.exists("v:this_session")
+    if (result_2_auto == 0) then
+      return false
+    else
+      return true
+    end
+  end
+  if ((vim.g.startify_session_persistance > 0) and _10_() and (vim.fn.filewritable(vim.v.this_session) > 0)) then
+    session_write.init(vim.fn.fnameescape(vim.v.this_session))
+  else
+  end
+  return vim.fn.system("notify-send 'VIMLEAVEPRE'")
+end
+_2amodule_2a["on-vimleavepre"] = on_vimleavepre
+local function init()
+  local function _13_()
     return on_vimenter()
   end
   local function _14_()

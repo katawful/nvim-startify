@@ -1,6 +1,7 @@
 (module nvim-startify.utils.autocmd
         {autoload {render nvim-startify.render.init
-                   file nvim-startify.utils.file}
+                   file nvim-startify.utils.file
+                   session-write nvim-startify.session.write}
          require-macros [nvim-startify.katcros-fnl.macros.nvim.api.autocommands.macros
                          nvim-startify.katcros-fnl.macros.nvim.api.options.macros
                          nvim-startify.katcros-fnl.macros.nvim.api.utils.macros]})
@@ -43,6 +44,13 @@ Returns true if empty"
 (defn on-vimenter [] "Runs for autocmd 'VimEnter'"
       (on-empty-session)
       (update-oldfiles))
+
+(defn on-vimleavepre [] "Runs for autocmd 'VimLeavePre'"
+      (if (and (> (get-var :g :startify_session_persistance) 0)
+               (do-viml exists "v:this_session")
+               (> (do-viml filewritable (get-var :v :this_session)) 0))
+        (session-write.init (do-viml fnameescape (get-var :v :this_session))))
+      (vim.fn.system "notify-send 'VIMLEAVEPRE'"))
 
 (defn init [] "Initialization"
         (aug- startify-aug
