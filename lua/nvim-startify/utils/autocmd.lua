@@ -82,7 +82,18 @@ local function init()
   local function _10_()
     return on_vimenter()
   end
-  return {vim.api.nvim_create_autocmd("VimEnter", {nested = true, callback = _10_, pattern = "*", group = startify_aug})}
+  local function _14_()
+    return on_vimleavepre()
+  end
+  local function _15_()
+    vim.g.startify_locked = 1
+    return nil
+  end
+  local function _16_()
+    vim.g.startify_locked = 0
+    return nil
+  end
+  return {vim.api.nvim_create_autocmd("VimEnter", {nested = true, pattern = "*", callback = _13_, group = startify_aug}), vim.api.nvim_create_autocmd("VimLeavePre", {nested = true, pattern = "*", callback = _14_, group = startify_aug}), vim.api.nvim_create_autocmd("QuickFixCmdPre", {callback = _15_, group = startify_aug, pattern = "*vimgrep*"}), vim.api.nvim_create_autocmd("QuickFixCmdPost", {callback = _16_, group = startify_aug, pattern = "*vimgrep*"})}
 end
 _2amodule_2a["init"] = init
 return _2amodule_2a

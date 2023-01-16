@@ -46,4 +46,9 @@ Returns true if empty"
 
 (defn init [] "Initialization"
         (aug- startify-aug
-              (auc- :VimEnter "*" (fn [] (on-vimenter)) {:nested true})))
+              (auc- :VimEnter "*" (fn [] (on-vimenter)) {:nested true})
+              (auc- :VimLeavePre "*" (fn [] (on-vimleavepre)) {:nested true})
+              (auc- :QuickFixCmdPre "*vimgrep*"
+                    (fn [] (set vim.g.startify_locked 1)))
+              (auc- :QuickFixCmdPost "*vimgrep*"
+                    (fn [] (set vim.g.startify_locked 0)))))
