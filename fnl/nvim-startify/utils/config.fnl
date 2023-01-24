@@ -5,6 +5,16 @@
 
 ;;; Module: handle config hotloading
 
+;; FN -- Handle boolean based vim variables
+;; @var-name -- String: name of variable
+;; @scope -- String: scope of variable
+;; @truthy -- value to return when variable is true
+;; @falsy -- value to return when variable is false
+(defn handle-vim-var [var-name scope truthy falsy]
+  "Handles conditonal returning vim variables cleanly"
+      (if (= (. (. vim scope) var-name) 0) falsy
+          (> (. (. vim scope) var-name) 0) truthy))
+
 ;; Key-val: A table of values used in startify options
 (def value {:relative-path ":~:."
             :absolute-path ":p:~"})

@@ -15,155 +15,165 @@ local fortune, _, _0 = autoload("nvim-startify.fortune.init"), nil, nil
 _2amodule_locals_2a["fortune"] = fortune
 _2amodule_locals_2a["_"] = _0
 _2amodule_locals_2a["_"] = _0
+local function handle_vim_var(var_name, scope, truthy, falsy)
+  if (vim[scope][var_name] == 0) then
+    return falsy
+  elseif (vim[scope][var_name] > 0) then
+    return truthy
+  else
+    return nil
+  end
+end
+_2amodule_2a["handle-vim-var"] = handle_vim_var
 local value = {["relative-path"] = ":~:.", ["absolute-path"] = ":p:~"}
 _2amodule_2a["value"] = value
 local default
-local function _1_(...)
+local function _2_(...)
   return vim.g.startify_files_number
 end
-local _2_
+local _3_
 if vim.g.startify_enable_special then
-  _2_ = __fnl_global__handle_2dvim_2dvar("startify_relative_path", "g", true, false)
+  _3_ = handle_vim_var("startify_relative_path", "g", true, false)
 else
-  _2_ = true
+  _3_ = true
 end
-local _4_
+local _5_
 if vim.g.startify_relative_path then
-  _4_ = __fnl_global__handle_2dvim_2dvar("startify_relative_path", "g", value["relative-path"], value["absolute-path"])
+  _5_ = handle_vim_var("startify_relative_path", "g", value["relative-path"], value["absolute-path"])
 else
-  _4_ = value["relative-path"]
+  _5_ = value["relative-path"]
 end
-local function _6_(...)
+local function _7_(...)
   return vim.g.startify_transformations
 end
-local _7_
+local _8_
 do
   local list
-  local function _8_(...)
+  local function _9_(...)
     return vim.g.startify_skiplist
   end
-  list = (_8_(...) or {})
+  list = (_9_(...) or {})
   table.insert(list, "runtime/doc/.*\\.txt$")
   table.insert(list, "bundle/.*/doc/.*\\.txt$")
   table.insert(list, "plugged/.*/doc/.*\\.txt$")
   table.insert(list, "/\\.git/")
   table.insert(list, "fugitiveblame$")
   table.insert(list, (vim.fn.escape(vim.fn.fnamemodify(vim.fn.resolve(vim.fn.getenv("VIMRUNTIME")), ":p"), "\\") .. "doc/.*\\.txt$"))
-  _7_ = list
-end
-local function _9_(...)
-  return vim.g.startify_skiplist_server
+  _8_ = list
 end
 local function _10_(...)
-  return vim.g.startify_padding_left
+  return vim.g.startify_skiplist_server
 end
 local function _11_(...)
+  return vim.g.startify_padding_left
+end
+local function _12_(...)
   return vim.g.startify_bookmarks
 end
-local _12_
+local _13_
 if vim.g.startify_change_to_dir then
-  _12_ = __fnl_global__handle_2dvim_2dvar("startify_change_to_dir", "g", true, false)
+  _13_ = handle_vim_var("startify_change_to_dir", "g", true, false)
 else
-  _12_ = true
+  _13_ = true
 end
-local _14_
+local _15_
 if vim.g.startify_change_to_vcs_dir then
-  _14_ = __fnl_global__handle_2dvim_2dvar("startify_change_to_vcs_dir", "g", true, false)
+  _15_ = handle_vim_var("startify_change_to_vcs_dir", "g", true, false)
 else
-  _14_ = false
-end
-local function _16_(...)
-  return vim.g.startify_change_cmd
+  _15_ = false
 end
 local function _17_(...)
-  return vim.g.startify_lists
+  return vim.g.startify_change_cmd
 end
 local function _18_(...)
+  return vim.g.startify_lists
+end
+local function _19_(...)
   return vim.g.startify_commands
 end
-local _19_
+local _20_
 if vim.g.startify_update_old_files then
-  _19_ = __fnl_global__handle_2dvim_2dvar("startify_update_old_files", "g", true, false)
+  _20_ = handle_vim_var("startify_update_old_files", "g", true, false)
 else
-  _19_ = false
+  _20_ = false
 end
-local function _21_(...)
+local function _22_(...)
   return vim.g.startify_session_dir
 end
-local _22_
+local _23_
 if vim.g.startify_session_autoload then
-  _22_ = __fnl_global__handle_2dvim_2dvar("startify_session_autoload", "g", true, false)
+  _23_ = handle_vim_var("startify_session_autoload", "g", true, false)
 else
-  _22_ = false
-end
-local function _24_(...)
-  return vim.g.startify_session_remove_lines
+  _23_ = false
 end
 local function _25_(...)
-  return vim.g.startify_session_savevars
+  return vim.g.startify_session_remove_lines
 end
 local function _26_(...)
-  return vim.g.startify_session_savecmds
+  return vim.g.startify_session_savevars
 end
 local function _27_(...)
+  return vim.g.startify_session_savecmds
+end
+local function _28_(...)
   return vim.g.startify_session_number
 end
-local _28_
+local _29_
 if vim.g.startify_session_persistence then
-  _28_ = __fnl_global__handle_2dvim_2dvar("startify_session_persistence", "g", true, false)
+  _29_ = handle_vim_var("startify_session_persistence", "g", true, false)
 else
-  _28_ = false
+  _29_ = false
 end
-local _30_
+local _31_
 if vim.g.startify_session_sort then
-  _30_ = __fnl_global__handle_2dvim_2dvar("startify_session_sort", "g", true, false)
+  _31_ = handle_vim_var("startify_session_sort", "g", true, false)
 else
-  _30_ = false
+  _31_ = false
 end
-local function _32_(...)
+local function _33_(...)
   return vim.g.startify_custom_indices
 end
-local _33_
+local _34_
 if vim.g.startify_custom_header then
   vim.notify("vim.g.startify_custom_header must be converted manually\nDefaulting to an empty value", vim.log.levels.WARN)
-  _33_ = {""}
+  _34_ = {""}
 else
-  _33_ = fortune.init()
-end
-local function _35_(...)
-  return vim.g.startify_custom_header_quotes
+  _34_ = fortune.init()
 end
 local function _36_(...)
+  return vim.g.startify_custom_header_quotes
+end
+local function _37_(...)
   return vim.g.startify_custom_footer
 end
-local _37_
+local _38_
 if vim.g.startify_disable_at_vimenter then
-  _37_ = __fnl_global__handle_2dvim_2dvar("startify_disable_at_vimenter", false, true)
+  _38_ = handle_vim_var("startify_disable_at_vimenter", false, true)
 else
-  _37_ = true
+  _38_ = true
 end
-local _39_
+local _40_
 if vim.g.startify_use_env then
-  _39_ = __fnl_global__handle_2dvim_2dvar("startify_use_env", true, false)
+  _40_ = handle_vim_var("startify_use_env", true, false)
 else
-  _39_ = false
+  _40_ = false
 end
-local function _41_(...)
+local function _42_(...)
   return vim.g.startify_session_before_save
 end
-local _42_
+local _43_
 if vim.g.startify_session_delete_buffers then
-  _42_ = __fnl_global__handle_2dvim_2dvar("startify_session_delete_buffers", "g", true, false)
+  _43_ = handle_vim_var("startify_session_delete_buffers", "g", true, false)
 else
-  _42_ = true
+  _43_ = true
 end
-local _44_
+local _45_
 if vim.g.startify_fortune_use_unicode then
-  _44_ = __fnl_global__handle_2dvim_2dvar("startify_fortune_use_unicode", "g", true, false)
+  _45_ = handle_vim_var("startify_fortune_use_unicode", "g", true, false)
 else
-  _44_ = false
+  _45_ = false
 end
-default = {["files-number"] = (_1_(...) or 10), ["show-special"] = _2_, ["use-relative-path"] = _4_, transformations = (_6_(...) or {}), skiplist = _7_, ["server-skiplist"] = (_9_(...) or {}), ["left-padding"] = (_10_(...) or 3), bookmarks = (_11_(...) or {}), ["change-to-dir"] = _12_, ["change-to-vcs-root"] = _14_, ["chdir-cmd"] = (_16_(...) or "lcd"), ["display-lists"] = (_17_(...) or {{type = "files", header = "   MRU"}, {type = "dir", header = ("   MRU " .. vim.fn.getcwd())}, {type = "sessions", header = "   Sessions"}, {type = "bookmarks", header = "   Bookmarks"}, {type = "commands", header = "   Commands"}}), commands = (_18_(...) or {}), ["update-old-files"] = _19_, ["session-dir"] = (_21_(...) or (vim.fn.stdpath("data") .. "/session")), ["session-autoload"] = _22_, ["session-remove-lines"] = (_24_(...) or {}), ["session-save-vars"] = (_25_(...) or {}), ["session-save-cmds"] = (_26_(...) or {}), ["session-number"] = (_27_(...) or 999), ["session-persistence"] = _28_, ["session-sort-time"] = _30_, ["custom-index"] = (_32_(...) or {}), ["custom-header"] = _33_, ["custom-header-quote"] = (_35_(...) or {}), ["custom-footer"] = (_36_(...) or ""), ["on-vimenter"] = _37_, ["show-env"] = _39_, ["pre-session-commands"] = (_41_(...) or {}), ["del-buf-on-session"] = _42_, ["fortune-unicode"] = _44_}
+default = {["files-number"] = (_2_(...) or 10), ["show-special"] = _3_, ["use-relative-path"] = _5_, transformations = (_7_(...) or {}), skiplist = _8_, ["server-skiplist"] = (_10_(...) or {}), ["left-padding"] = (_11_(...) or 3), bookmarks = (_12_(...) or {}), ["change-to-dir"] = _13_, ["change-to-vcs-root"] = _15_, ["chdir-cmd"] = (_17_(...) or "lcd"), ["display-lists"] = (_18_(...) or {{type = "files", header = "   MRU"}, {type = "dir", header = ("   MRU " .. vim.fn.getcwd())}, {type = "sessions", header = "   Sessions"}, {type = "bookmarks", header = "   Bookmarks"}, {type = "commands", header = "   Commands"}}), commands = (_19_(...) or {}), ["update-old-files"] = _20_, ["session-dir"] = (_22_(...) or (vim.fn.stdpath("data") .. "/session")), ["session-autoload"] = _23_, ["session-remove-lines"] = (_25_(...) or {}), ["session-save-vars"] = (_26_(...) or {}), ["session-save-cmds"] = (_27_(...) or {}), ["session-number"] = (_28_(...) or 999), ["session-persistence"] = _29_, ["session-sort-time"] = _31_, ["custom-index"] = (_33_(...) or {}), ["custom-header"] = _34_, ["custom-header-quote"] = (_36_(...) or {}), ["custom-footer"] = (_37_(...) or ""), ["on-vimenter"] = _38_, ["show-env"] = _40_, ["pre-session-commands"] = (_42_(...) or {}), ["del-buf-on-session"] = _43_, ["fortune-unicode"] = _45_}
 _2amodule_2a["default"] = default
 local opts = {}
 _2amodule_2a["opts"] = opts

@@ -20,16 +20,6 @@ _2amodule_locals_2a["fortune"] = fortune
 _2amodule_locals_2a["map"] = map
 _2amodule_locals_2a["_"] = _0
 _2amodule_locals_2a["_"] = _0
-local function handle_vim_var(var_name, scope, truthy, falsy)
-  if (vim[scope][var_name] == 0) then
-    return falsy
-  elseif (vim[scope][var_name] > 0) then
-    return truthy
-  else
-    return nil
-  end
-end
-_2amodule_2a["handle-vim-var"] = handle_vim_var
 local value = {["relative-path"] = ":~:.", ["absolute-path"] = ":p:~"}
 _2amodule_2a["value"] = value
 local function config(opts)
