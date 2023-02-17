@@ -1,6 +1,6 @@
 name: vim-startify Feature Missing or Broken
 about: A feature from vim-startify is missing or broken
-title: "[vim-startify]: <title>"
+title: "[vim-startify]: "
 labels: 'vim-startify'
 assignees: katawful
 
@@ -12,6 +12,7 @@ body:
     validations:
       required: true
 - type: dropdown
+  id: version
   attributes:
     label: Missing or broken?
     description: Is the feature missing from the project or broken in the project?
