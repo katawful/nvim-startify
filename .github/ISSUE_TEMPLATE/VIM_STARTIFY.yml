@@ -17,7 +17,7 @@ body:
       label: Missing or broken?
       description: Is the feature missing from the project or broken in the project?
       options:
-        - "Missing" (Default)
-        - "Broken"
+        - Missing (Default)
+        - Broken
     validations:
       required: true
