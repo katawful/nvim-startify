@@ -9,8 +9,8 @@ body:
     attributes:
       label: Which feature from vim-startify?
       description: Please write, link, or describe the feature in question
-      validations:
-        required: true
+    validations:
+      required: true
   - type: dropdown
     id: version
     attributes:
