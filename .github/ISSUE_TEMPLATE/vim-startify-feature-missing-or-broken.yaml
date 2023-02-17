@@ -1,0 +1,22 @@
+name: vim-startify Feature Missing or Broken
+about: A feature from vim-startify is missing or broken
+title: "[vim-startify]: <title>"
+labels: 'vim-startify'
+assignees: katawful
+
+body:
+- type: textarea
+  attributes:
+    label: Which feature from vim-startify?
+    description: Please write, link, or describe the feature in question
+    validations:
+      required: true
+- type: dropdown
+  attributes:
+    label: Missing or broken?
+    description: Is the feature missing from the project or broken in the project?
+    options:
+    - "Missing" (Default)
+    - "Broken"
+  validations:
+    required: true
