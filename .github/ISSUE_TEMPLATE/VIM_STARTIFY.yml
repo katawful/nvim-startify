@@ -5,19 +5,19 @@ labels: 'vim-startify'
 assignees: katawful
 
 body:
-- type: textarea
-  attributes:
-    label: Which feature from vim-startify?
-    description: Please write, link, or describe the feature in question
+  - type: textarea
+    attributes:
+      label: Which feature from vim-startify?
+      description: Please write, link, or describe the feature in question
+      validations:
+        required: true
+  - type: dropdown
+    id: version
+    attributes:
+      label: Missing or broken?
+      description: Is the feature missing from the project or broken in the project?
+      options:
+        - "Missing" (Default)
+        - "Broken"
     validations:
       required: true
-- type: dropdown
-  id: version
-  attributes:
-    label: Missing or broken?
-    description: Is the feature missing from the project or broken in the project?
-    options:
-    - "Missing" (Default)
-    - "Broken"
-  validations:
-    required: true
