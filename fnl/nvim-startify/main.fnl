@@ -11,15 +11,13 @@
 ;;; Module: main plugin interface
 ;;; Sets up everything needed, diverting functionality between modules
 
-;; Key-val -- A table of values used in startify options
-(def value {:relative-path ":~:."
-            :absolute-path ":p:~"})
-
-;; FN -- Easily accessible module to pass config to hotloader
+;;; FN: Easily accessible module to pass config to hotloader
+;;; @opts: Key/val -- config values
 (defn config [opts] "Pass options to be loaded"
       (configs.hotload opts))
 
-(defn init []
+;;; FN: module initialization
+(defn init [] "Module initialization"
   (print "HI")
   (if (a.empty? configs.opts)
     (configs.hotload))
