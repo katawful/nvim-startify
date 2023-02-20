@@ -18,7 +18,7 @@ body:
       description: Is the feature waiting on another feature?
       options:
         - No (Default)
-        - Yes
+        - Yes it is
     validations:
       required: true
   - type: textarea
