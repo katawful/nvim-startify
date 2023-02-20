@@ -114,7 +114,13 @@ Defaulting to an empty value" vim.log.levels.WARN) [""])
               :fortune-unicode (if (get-var :g :startify_fortune_use_unicode)
                                    (handle-vim-var :startify_fortune_use_unicode :g
                                                    true false)
-                                   false)})
+                                   false)
+              :top-padding 1
+              :left-padding 4
+              :alignment :center
+              :width 80
+              :render-order [:header :special
+                             :lists :footer]})
 
 ;; Key-val: Table of configuration values
 (def opts {})
