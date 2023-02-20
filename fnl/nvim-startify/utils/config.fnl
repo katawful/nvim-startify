@@ -5,13 +5,17 @@
 
 ;;; Module: handle config hotloading
 
-;; FN -- Handle boolean based vim variables
-;; @var-name -- String: name of variable
-;; @scope -- String: scope of variable
-;; @truthy -- value to return when variable is true
-;; @falsy -- value to return when variable is false
+;; FN: Handle boolean based vim variables
+;; @var-name: String -- name of variable
+;; @scope: String -- scope of variable
+;; @truthy: value to return when variable is true
+;; @falsy: value to return when variable is false
 (defn handle-vim-var [var-name scope truthy falsy]
-  "Handles conditonal returning vim variables cleanly"
+  "Handles conditonal returning vim variables cleanly
+@var-name -- String: the vim variable name
+@scope -- String: the scope from vim (g, b, etc...)
+@truthy -- value to return when variable is true
+@falsy -- value to return when variable is false"
       (if (= (. (. vim scope) var-name) 0) falsy
           (> (. (. vim scope) var-name) 0) truthy))
 
@@ -115,12 +119,26 @@ Defaulting to an empty value" vim.log.levels.WARN) [""])
 ;; Key-val: Table of configuration values
 (def opts {})
 
-;; FN -- hotload config options, mutating 'opts' table
-;; @config -- config options
-(defn hotload [config] "Loads in config from settings"
+;; FN: hotload config options, mutating 'opts' table
+;; @config: Key/val -- config options
+(defn hotload [config] "Loads in config from settings
+@config -- Key/val: The table of startify configs"
       (if config
         (let [out (vim.tbl_deep_extend :force default config)]
           (each [k v (pairs out)]
             (tset opts k v)))
         (each [k v (pairs default)]
           (tset opts k v))))
+
+;;; FN: Is servername in skiplist?
+;;; Returns true if vim.v.servername was in server skiplist
+(defn server-skipped? [] "Sees if the current server needs to be skipped
+Returns true if vim.v.servername was in server skiplist"
+      (let [found? []]
+        (each [_ server (ipairs opts.server-skiplist) :until (> (length found?) 0)]
+          (if (= server vim.v.servername)
+            (table.insert found? true)))
+        (if (> (length found?) 0)
+          true
+          false)))
+

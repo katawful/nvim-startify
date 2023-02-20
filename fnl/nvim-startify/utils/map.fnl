@@ -4,5 +4,6 @@
 
 ;;; Module: set mappings
 
+;;; FN: Module initialization
 (defn init [] "Set global keymaps"
       (nno- "<plug>(startify-open-buffers)" buffer.open))

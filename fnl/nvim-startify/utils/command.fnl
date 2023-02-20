@@ -5,13 +5,17 @@
 
 ;;; Module: generate and run user-commands
 
+;;; FN: Completion function for user command 'SLoad'
 (defn completion-sload [] "Completion for user command 'SLoad'"
       {})
+;;; FN: Completion function for user command 'SSave'
 (defn completion-ssave [] "Completion for user command 'SSave'"
       {})
+;;; FN: Completion function for user command 'SDelete'
 (defn completion-sdelete [] "Completion for user command 'SDelete'"
       {})
 
+;;; FN: Initialization for module
 (defn init [] "Initialization"
       (cre-command :SLoad (fn [args] (session-load.init args.bang args.fargs))
                           {:nargs "?"
