@@ -1,0 +1,29 @@
+name: Feature Addition
+description: Addition of a feature
+title: "[Feature]: "
+labels: 'feature'
+assignees: katawful
+
+body:
+  - type: textarea
+    attributes:
+      label: What is the feature
+      description: Please write, link, or describe the feature in question
+    validations:
+      required: true
+  - type: dropdown
+    id: version
+    attributes:
+      label: Waiting on?
+      description: Is the feature waiting on another feature?
+      options:
+        - No (Default)
+        - Yes
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What feature is this wating on?
+      description: Either the issue, PR, or a description of the feature
+    validations:
+      required: false
