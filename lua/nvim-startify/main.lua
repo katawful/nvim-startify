@@ -20,8 +20,6 @@ _2amodule_locals_2a["fortune"] = fortune
 _2amodule_locals_2a["map"] = map
 _2amodule_locals_2a["_"] = _0
 _2amodule_locals_2a["_"] = _0
-local value = {["relative-path"] = ":~:.", ["absolute-path"] = ":p:~"}
-_2amodule_2a["value"] = value
 local function config(opts)
   return configs.hotload(opts)
 end
