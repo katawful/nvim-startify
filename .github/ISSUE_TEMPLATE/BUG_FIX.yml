@@ -1,0 +1,13 @@
+name: Bug
+description: Bug in nvim-startify
+title: "[Bug]: "
+labels: 'bug'
+assignees: katawful
+
+body:
+  - type: textarea
+    attributes:
+      label: What is the bug
+      description: Please write a description of the bug
+    validations:
+      required: true
