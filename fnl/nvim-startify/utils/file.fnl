@@ -71,8 +71,15 @@ Returns modified seq"
 Returns last line of buffer"
       (length (vim.api.nvim_buf_get_lines buffer 0 -1 false)))
 
+;; FN: Global version of lastline
+(fn _G.startify_lastline [buffer] "Global version of lastline"
+    (lastline buffer))
+
 ;;; String: filesystem separator
 (def separator (if (do-viml has :win32) "\\" "/"))
+
+;;; FN: Function return of filesystem separator
+(fn _G.startify_fn_separator [] separator)
 
 ;;; FN: Inserts blankline into file
 ;;; @buffer: Number -- represents a buffer
