@@ -23,7 +23,7 @@ _2amodule_locals_2a["iter"] = iter
 _2amodule_locals_2a["loader"] = loader
 _2amodule_locals_2a["_"] = _0
 _2amodule_locals_2a["_"] = _0
-local startify_opts = {bufhidden = "wipe", colorcolumn = "0", foldcolumn = "0", matchpairs = "", signcolumn = "no", list = false, cursorcolumn = false, cursorline = false, spell = false, buflisted = false, readonly = false, relativenumber = false, number = false, swapfile = false}
+local startify_opts = {bufhidden = "wipe", colorcolumn = "0", foldcolumn = "0", matchpairs = "", signcolumn = "no", cursorcolumn = false, spell = false, cursorline = false, number = false, buflisted = false, readonly = false, relativenumber = false, list = false, swapfile = false}
 _2amodule_2a["startify-opts"] = startify_opts
 local function set_options(buffer)
   for opt, val in pairs(startify_opts) do

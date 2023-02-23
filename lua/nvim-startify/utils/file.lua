@@ -88,6 +88,9 @@ else
   separator = "/"
 end
 _2amodule_2a["separator"] = separator
+_G.startify_fn_separator = function()
+  return separator
+end
 local function insert_blankline(buffer, amount)
   for i = 1, amount do
     vim.api.nvim_buf_set_lines(buffer, -1, -1, false, {""})
