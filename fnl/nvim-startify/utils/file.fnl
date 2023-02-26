@@ -228,12 +228,13 @@ Returns the amount of padding for the left hand side of the content"
 ;;; FN: Create whitespace string of some length
 ;;; @amount: Number -- amount of whitespace to add
 ;;; Returns whitespace string
-(defn- padded-string [amount] "Create whitespace string of some length
+(defn padded-string [amount] "Create whitespace string of some length
 @amount: Number -- amount of whitespace to add
 Returns whitespace string"
-      (var str "")
-      (for [i 1 amount] (set str (.. str " ")))
-      str)
+      (let [amount (if amount amount 0)]
+        (var str "")
+        (for [i 1 amount] (set str (.. str " ")))
+        str))
 
 ;;; FN: Add a line of content to startify buffer
 ;;; @buffer: Number -- represents a buffer

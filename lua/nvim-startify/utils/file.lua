@@ -194,13 +194,19 @@ local function alignment(align_type, content, padding)
 end
 _2amodule_2a["alignment"] = alignment
 local function padded_string(amount)
+  local amount0
+  if amount then
+    amount0 = amount
+  else
+    amount0 = 0
+  end
   local str = ""
-  for i = 1, amount do
+  for i = 1, amount0 do
     str = (str .. " ")
   end
   return str
 end
-_2amodule_locals_2a["padded-string"] = padded_string
+_2amodule_2a["padded-string"] = padded_string
 local function add_line(buffer, content, pos, format)
   local align
   if format.align then
@@ -209,14 +215,14 @@ local function add_line(buffer, content, pos, format)
     align = config.opts.format.align
   end
   local padding
-  local function _16_()
+  local function _17_()
     if format.padding then
       return format.padding
     else
       return config.opts.format.padding
     end
   end
-  padding = alignment(align, content, _16_())
+  padding = alignment(align, content, _17_())
   local padded_content = string.format("%s%s", padded_string(padding), content)
   local pos0 = (pos - 1)
   return vim.api.nvim_buf_set_lines(buffer, pos0, pos0, false, {padded_content})
