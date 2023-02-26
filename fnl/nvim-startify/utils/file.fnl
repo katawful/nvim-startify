@@ -5,7 +5,8 @@
          require-macros [nvim-startify.katcros-fnl.macros.nvim.api.options.macros
                          nvim-startify.katcros-fnl.macros.nvim.api.utils.macros]})
 
-;;; Module: file management
+;;; Module: direct management of the startify "file" itself
+;;; This is stuff like character position, line setting, etc...
 
 ;; Key-val: stores information for startify page
 ;; Each key is a buffer number for the startify buffers
@@ -93,45 +94,140 @@ Returns amount inserted"
       (for [i 1 amount]
         (vim.api.nvim_buf_set_lines buffer -1 -1 false [""])))
 
-;;; FN: Pad for center alignment
+;;; FN: Pad for center alignment of the window
 ;;; Returns amount of padding for center alignment
-(defn center-align [] "Pad for center alignment
+(defn center-align-window [] "Pad for center alignment
 Returns amount of padding for center alignment"
       (let [win-width (vim.api.nvim_win_get_width 0)
             content-width config.opts.width]
         (math.floor (/ (- win-width content-width) 2))))
 
-;;; FN: Pad for right alignment
+;;; FN: Pad for right alignment of the window
 ;;; Returns amount of padding for right alignment
-(defn right-align [] "Pad for right alignment
+(defn right-align-window [] "Pad for right alignment
 Returns amount of padding for right alignment"
       (let [win-width (vim.api.nvim_win_get_width 0)
             content-width config.opts.width]
         (- win-width content-width)))
 
-;;; FN: Get alignment values based on config setting
-;;; Returns alignment value
-(defn align-value [] "Get the needed padding values for alignment
-Returns alignment value"
-      (match config.opts.alignment
-        :center (center-align)
-        :left config.opts.left-padding
-        :right (right-align)))
-
-;;; FN: Aligns header to window
-;;; @buffer: Number -- represents a buffer
-;;; Returns alignment value
-(defn header-align [buffer] "Aligns header to window
-@buffer: Number -- represents a buffer
-Returns alignment value"
+;;; FN: Get amount of padding for center to window alignment
+;;; @content: String -- the line that needs padding
+;;; Returns the amount of padding for the left hand side of the content
+(defn center-align-window [content]
+  "Get the amount of padding for center window alignment
+This will add padding from the left-most side of the content
+To do this, we get the amount of characters to the middle of the content
+@content: String -- the line that needs padding
+Returns the amount of padding for the left hand side of the content"
       (let [win-width (vim.api.nvim_win_get_width 0)
-            content-width (fortune.longest-line buffer)]
-        (math.floor (/ (- win-width content-width) 2))))
+            ;; number of characters to middle
+            content-middle (math.floor (/ (length content) 2))
+            win-middle (math.floor (/ win-width 2))]
+        (- win-middle content-middle)))
+
+;;; FN: Get amount of padding for right to window alignment
+;;; @content: String -- the line that needs padding
+;;; @padding: Number -- the amount of padding to add to the rhs of content
+;;; Returns the amount of padding for the left hand side of the content
+(defn right-align-window [content padding]
+  "Get the amount of padding for right window alignment
+This will add padding from the left-most side of the content
+To do this, we get the amount of characters to the middle of the content
+With padding passed, this will push the content further to the left
+@content: String -- the line that needs padding
+@padding: Number -- the amount of padding to add to the rhs of content
+Returns the amount of padding for the left hand side of the content"
+      (let [win-width (vim.api.nvim_win_get_width 0)
+            content-width (length content)]
+        (- win-width
+           content-width
+           (if padding padding 0)))) ; padding is optional
+
+;;; FN: Get amount of padding for left to window alignment
+;;; @content: String -- the line that needs padding
+;;; @padding: Number -- the amount of padding to add to the lhs of content
+;;; Returns the amount of padding for the left hand side of the content
+(defn left-align-window [content padding]
+  "Get the amount of padding for left window alignment
+This will add padding from the left-most side of the content
+To do this, we get the amount of characters to the middle of the content
+@content: String -- the line that needs padding
+Returns the amount of padding for the left hand side of the content"
+      padding)
+
+;;; FN: Get amount of padding for center to page alignment
+;;; @content: String -- the line that needs padding
+;;; Returns the amount of padding for the left hand side of the content
+(defn center-align-page [content]
+  "Get the amount of padding for center page alignment
+This will add padding from the left-most side of the content
+To do this, we get the amount of characters to the middle of the content
+@content: String -- the line that needs padding
+Returns the amount of padding for the left hand side of the content"
+      (let [win-width (vim.api.nvim_win_get_width 0)
+            ;; number of characters to middle
+            content-middle (math.floor (/ (length content) 2))
+            page-width config.opts.format.page-width
+            page-middle (math.floor (/ page-width 2))
+            page-margin (math.floor (/ (- win-width page-width) 2))
+            win-middle (math.floor (/ win-width 2))]
+        (+ page-margin
+           (- page-middle content-middle))))
+
+;;; FN: Get amount of padding for right to page alignment
+;;; @content: String -- the line that needs padding
+;;; @padding: Number -- the amount of padding to add to the rhs of content
+;;; Returns the amount of padding for the left hand side of the content
+(defn right-align-page [content padding]
+  "Get the amount of padding for right page alignment
+This will add padding from the left-most side of the content
+To do this, we get the amount of characters to the middle of the content
+With padding passed, this will push the content further to the left
+@content: String -- the line that needs padding
+@padding: Number -- the amount of padding to add to the rhs of content
+Returns the amount of padding for the left hand side of the content"
+      (let [win-width (vim.api.nvim_win_get_width 0)
+            content-width (length content)
+            page-width config.opts.format.page-width
+            page-margin (math.floor (/ (- win-width page-width) 2))]
+        (+ page-margin
+           (- page-width
+              content-width
+              (if padding padding 0))))) ; padding is optional
+
+;;; FN: Get amount of padding for left to page alignment
+;;; @content: String -- the line that needs padding
+;;; @padding: Number -- the amount of padding to add to the lhs of content
+;;; Returns the amount of padding for the left hand side of the content
+(defn left-align-page [content padding]
+  "Get the amount of padding for left page alignment
+This will add padding from the left-most side of the content
+To do this, we get the amount of characters to the middle of the content
+@content: String -- the line that needs padding
+Returns the amount of padding for the left hand side of the content"
+      (let [win-width (vim.api.nvim_win_get_width 0)
+            content-width (length content)
+            page-width config.opts.format.page-width
+            page-margin (math.floor (/ (- win-width page-width) 2))]
+        (+ page-margin padding)))
+
+;;; FN: Run and return an alignment function
+;;; @align-type String -- the string to describe alignment to use
+;;; @content: String -- the string of content
+;;; @padding: Number -- amound of padding to add if needed
+(defn alignment [align-type content padding]
+      (match align-type
+        :right-window (right-align-window content padding)
+        :right-page (right-align-page content padding)
+        :left-window (left-align-window content padding)
+        :left-page (left-align-page content padding)
+        :center-window (center-align-window content)
+        :center-page (center-align-page)))
 
 ;;; FN: Create whitespace string of some length
 ;;; @amount: Number -- amount of whitespace to add
 ;;; Returns whitespace string
-(defn padding [amount] "Create whitespace string of some length
+(defn- padding [amount] "Create whitespace string of some length
 @amount: Number -- amount of whitespace to add
 Returns whitespace string"
       (var str "")
