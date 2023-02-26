@@ -72,6 +72,9 @@ local function lastline(buffer)
   return #vim.api.nvim_buf_get_lines(buffer, 0, -1, false)
 end
 _2amodule_2a["lastline"] = lastline
+_G.startify_lastline = function(buffer)
+  return lastline(buffer)
+end
 local separator
 local _7_
 do
@@ -98,51 +101,125 @@ local function insert_blankline(buffer, amount)
   return nil
 end
 _2amodule_2a["insert-blankline"] = insert_blankline
-local function center_align()
+local function center_align_window()
   local win_width = vim.api.nvim_win_get_width(0)
   local content_width = config.opts.width
   return math.floor(((win_width - content_width) / 2))
 end
-_2amodule_2a["center-align"] = center_align
-local function right_align()
+_2amodule_2a["center-align-window"] = center_align_window
+local function right_align_window()
   local win_width = vim.api.nvim_win_get_width(0)
   local content_width = config.opts.width
   return (win_width - content_width)
 end
-_2amodule_2a["right-align"] = right_align
-local function align_value()
-  local _11_ = config.opts.alignment
-  if (_11_ == "center") then
-    return center_align()
-  elseif (_11_ == "left") then
-    return config.opts["left-padding"]
-  elseif (_11_ == "right") then
-    return right_align()
+_2amodule_2a["right-align-window"] = right_align_window
+local function center_align_window0(content)
+  local win_width = vim.api.nvim_win_get_width(0)
+  local content_middle = math.floor((#content / 2))
+  local win_middle = math.floor((win_width / 2))
+  return (win_middle - content_middle)
+end
+_2amodule_2a["center-align-window"] = center_align_window0
+local function right_align_window0(content, padding)
+  local win_width = vim.api.nvim_win_get_width(0)
+  local content_width = #content
+  local function _11_()
+    if padding then
+      return padding
+    else
+      return 0
+    end
+  end
+  return (win_width - content_width - _11_())
+end
+_2amodule_2a["right-align-window"] = right_align_window0
+local function left_align_window(content, padding)
+  return padding
+end
+_2amodule_2a["left-align-window"] = left_align_window
+local function center_align_page(content)
+  local win_width = vim.api.nvim_win_get_width(0)
+  local content_middle = math.floor((#content / 2))
+  local page_width = config.opts.format["page-width"]
+  local page_middle = math.floor((page_width / 2))
+  local page_margin = math.floor(((win_width - page_width) / 2))
+  local win_middle = math.floor((win_width / 2))
+  return (page_margin + (page_middle - content_middle))
+end
+_2amodule_2a["center-align-page"] = center_align_page
+local function right_align_page(content, padding)
+  local win_width = vim.api.nvim_win_get_width(0)
+  local content_width = #content
+  local page_width = config.opts.format["page-width"]
+  local page_margin = math.floor(((win_width - page_width) / 2))
+  local function _12_()
+    if padding then
+      return padding
+    else
+      return 0
+    end
+  end
+  return (page_margin + (page_width - content_width - _12_()))
+end
+_2amodule_2a["right-align-page"] = right_align_page
+local function left_align_page(content, padding)
+  local win_width = vim.api.nvim_win_get_width(0)
+  local content_width = #content
+  local page_width = config.opts.format["page-width"]
+  local page_margin = math.floor(((win_width - page_width) / 2))
+  return (page_margin + padding)
+end
+_2amodule_2a["left-align-page"] = left_align_page
+local function alignment(align_type, content, padding)
+  local _13_ = align_type
+  if (_13_ == "right-window") then
+    return right_align_window0(content, padding)
+  elseif (_13_ == "right-page") then
+    return right_align_page(content, padding)
+  elseif (_13_ == "left-window") then
+    return left_align_window(content, padding)
+  elseif (_13_ == "left-page") then
+    return left_align_page(content, padding)
+  elseif (_13_ == "center-window") then
+    return center_align_window0(content)
+  elseif (_13_ == "center-page") then
+    return center_align_page(content)
+  elseif true then
+    local _1 = _13_
+    vim.notify("Invalid alignment value", vim.log.levels.ERROR)
+    return 0
   else
     return nil
   end
 end
-_2amodule_2a["align-value"] = align_value
-local function header_align(buffer)
-  local win_width = vim.api.nvim_win_get_width(0)
-  local content_width = fortune["longest-line"](buffer)
-  return math.floor(((win_width - content_width) / 2))
-end
-_2amodule_2a["header-align"] = header_align
-local function padding(amount)
+_2amodule_2a["alignment"] = alignment
+local function padded_string(amount)
   local str = ""
   for i = 1, amount do
     str = (str .. " ")
   end
   return str
 end
-_2amodule_2a["padding"] = padding
-local function pad_contents(buffer, contents, amount)
-  local out = {}
-  for _1, v in ipairs(get_value(buffer, "header", "contents")) do
-    table.insert(out, (padding(amount) .. v))
+_2amodule_locals_2a["padded-string"] = padded_string
+local function add_line(buffer, content, pos, format)
+  local align
+  if format.align then
+    align = format.align
+  else
+    align = config.opts.format.align
   end
-  return out
+  local padding
+  local function _16_()
+    if format.padding then
+      return format.padding
+    else
+      return config.opts.format.padding
+    end
+  end
+  padding = alignment(align, content, _16_())
+  local padded_content = string.format("%s%s", padded_string(padding), content)
+  local pos0 = (pos - 1)
+  return vim.api.nvim_buf_set_lines(buffer, pos0, pos0, false, {padded_content})
 end
-_2amodule_2a["pad-contents"] = pad_contents
+_2amodule_2a["add-line"] = add_line
 return _2amodule_2a

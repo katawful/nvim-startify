@@ -222,27 +222,41 @@ Returns the amount of padding for the left hand side of the content"
         :left-window (left-align-window content padding)
         :left-page (left-align-page content padding)
         :center-window (center-align-window content)
-        :center-page (center-align-page)))
+        :center-page (center-align-page content)
+        _ (do (vim.notify "Invalid alignment value" vim.log.levels.ERROR) 0)))
 
 ;;; FN: Create whitespace string of some length
 ;;; @amount: Number -- amount of whitespace to add
 ;;; Returns whitespace string
-(defn- padding [amount] "Create whitespace string of some length
+(defn- padded-string [amount] "Create whitespace string of some length
 @amount: Number -- amount of whitespace to add
 Returns whitespace string"
       (var str "")
       (for [i 1 amount] (set str (.. str " ")))
       str)
 
-;;; FN: Pads content
+;;; FN: Add a line of content to startify buffer
 ;;; @buffer: Number -- represents a buffer
-;;; @contents: Seq -- lines to pad
-;;; @amount: Number -- amount of padding to add
-(defn pad-contents [buffer contents amount] "Pads content
+;;; @content: String -- a single line of text to add to file
+;;; @pos: Number -- the line number to place content
+;;; @format: Key/val -- a formatting table
+(defn add-line [buffer content pos format] "Adds a single line of content to buffer
+This only adds a line to the buffer
+The full IFY implementation uses this function repeatedly
 @buffer: Number -- represents a buffer
-@contents: Seq -- lines to pad
-@amount: Number -- amount of padding to add"
-      (let [out []]
-        (each [_ v (ipairs (get-value buffer :header :contents))]
-          (table.insert out (.. (padding amount) v)))
-        out))
+@contents: String -- a single line of text to add to file
+@format: Key/val -- a formatting table"
+      (let [align (if format.align format.align
+                    config.opts.format.align)
+            padding (alignment align content
+                               (if format.padding format.padding
+                                   config.opts.format.padding))
+            padded-content (string.format "%s%s"
+                                          (padded-string padding)
+                                          content)
+            pos (- pos 1)] ; nvim api is 0 index which is confusing
+        (vim.api.nvim_buf_set_lines buffer
+                                    pos
+                                    pos
+                                    false
+                                    [padded-content])))
