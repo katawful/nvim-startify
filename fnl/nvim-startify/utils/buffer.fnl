@@ -2,7 +2,8 @@
         {autoload {file nvim-startify.utils.file
                    extmark nvim-startify.utils.extmark}})
 
-;;; Module: buffer management
+;;; Module: overview managment of the startify "file"
+;;; This is stuff like options, state, etc...
 
 (defn open [...] "open buffers"
       (print "BUFFERS OPENED"))
@@ -30,6 +31,51 @@ Returns true if buffer is modifiable"
       (if (vim.api.nvim_buf_get_option buffer :modifiable)
           true
           false))
+
+;;; Key/val: options of startify buffer
+(def startify-opts {:bufhidden :wipe
+                    :colorcolumn :0
+                    :foldcolumn :0
+                    :matchpairs ""
+                    :buflisted false
+                    :cursorcolumn false
+                    :cursorline false
+                    :list false
+                    :number false
+                    :readonly false
+                    :relativenumber false
+                    :spell false
+                    :swapfile false
+                    :signcolumn :no})
+
+;;; FN: Set buffer options for startify.
+;;; This is currently unclean
+;;; @buffer: Number -- represents buffer
+(defn set-options [buffer] "Set buffer opts for startify
+This isn't particularly clean, but it's needed to set some options properly
+@buffer: Number -- represents buffer"
+      (each [opt val (pairs startify-opts)]
+        (tset vim.opt_local opt val))
+      (vim.api.nvim_buf_set_option buffer :synmaxcol
+                                   (. (vim.api.nvim_get_option_info :synmaxcol) :default))
+      (if (not (vim.api.nvim_win_get_option 0 :statusline))
+        (vim.api.nvim_win_set_option 0 :statusline "\\ startify"))
+      (tset (. vim.bo buffer) :filetype :startify))
+
+;;; FN: start the startify buffer
+;;; @buffer: Number -- represents a buffer
+(defn start [buffer] "start the startify buffer
+@buffer: Number -- represents a buffer"
+      (set-options buffer)
+
+      ;; Insert an arbitrary amount of blanklines for easier implementation
+      (file.insert-blankline buffer 1000))
+
+;;; FN: unmodifies a buffer
+;;; @buffer: Number -- represents a buffer
+(defn unmodify [buffer] "Unmodify a buffer"
+      (vim.api.nvim_buf_set_option buffer :modified false)
+      (vim.api.nvim_buf_set_option buffer :modifiable false))
 
 ;;; FN: Is visible buffer modified
 ;;; @buffer: Number -- represents a buffer

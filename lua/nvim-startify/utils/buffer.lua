@@ -40,6 +40,31 @@ local function modifiable_3f(buffer)
   end
 end
 _2amodule_2a["modifiable?"] = modifiable_3f
+local startify_opts = {bufhidden = "wipe", colorcolumn = "0", foldcolumn = "0", matchpairs = "", signcolumn = "no", readonly = false, swapfile = false, relativenumber = false, list = false, spell = false, cursorcolumn = false, number = false, cursorline = false, buflisted = false}
+_2amodule_2a["startify-opts"] = startify_opts
+local function set_options(buffer)
+  for opt, val in pairs(startify_opts) do
+    vim.opt_local[opt] = val
+  end
+  vim.api.nvim_buf_set_option(buffer, "synmaxcol", (vim.api.nvim_get_option_info("synmaxcol")).default)
+  if not vim.api.nvim_win_get_option(0, "statusline") then
+    vim.api.nvim_win_set_option(0, "statusline", "\\ startify")
+  else
+  end
+  vim.bo[buffer]["filetype"] = "startify"
+  return nil
+end
+_2amodule_2a["set-options"] = set_options
+local function start(buffer)
+  set_options(buffer)
+  return file["insert-blankline"](buffer, 1000)
+end
+_2amodule_2a["start"] = start
+local function unmodify(buffer)
+  vim.api.nvim_buf_set_option(buffer, "modified", false)
+  return vim.api.nvim_buf_set_option(buffer, "modifiable", false)
+end
+_2amodule_2a["unmodify"] = unmodify
 local function visible_modified_3f(buffer)
   if (vim.api.nvim_buf_get_option(buffer, "modified") and not vim.api.nvim_buf_get_option(buffer, "hidden")) then
     vim.notify("Save your changes first.")
