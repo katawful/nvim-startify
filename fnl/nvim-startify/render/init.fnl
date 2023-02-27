@@ -1,6 +1,7 @@
 (module nvim-startify.render.init
         {autoload {file nvim-startify.utils.file
                    buf nvim-startify.utils.buffer
+                   iter nvim-startify.render.iterator
                    config nvim-startify.utils.config
                    extmark nvim-startify.utils.extmark
                    index nvim-startify.utils.index}
@@ -27,6 +28,8 @@
         (do (print "STARTIFY  RUN")
           (vim.api.nvim_win_set_buf 0 buffer)
           (buf.start buffer)
+
+          (iter.loop buffer)
 
           ;; Unmodify buffer when done
           (buf.unmodify buffer))
