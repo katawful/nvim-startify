@@ -8,9 +8,13 @@
 ;;; Module: direct management of the startify "file" itself
 ;;; This is stuff like character position, line setting, etc...
 
-;; Key-val: stores information for startify page
-;; Each key is a buffer number for the startify buffers
-;; TODO: I eventually want to expand this to unique startify pages
+;;; Key-val: stores information for startify page
+;;; Each key is a buffer number for the startify buffers
+;;; Key: (b) if the key is buffer local
+;;; global-index-state (b): Indeterminate Seq -- holds last used global index
+;;; global-index-position (b): Mutable Number -- holds the last global index position
+;;; namespace: Number -- namespace to use for startify
+;;; TODO: I eventually want to expand this to unique startify pages
 (def startify {})
 
 ;;; FN: Get some value from the file.startify value table
@@ -24,9 +28,9 @@ variarg: values to get from startify
 Returns value"
       (let [vals [...]]
         (match (length vals)
-          1 (. (. startify buffer) (. vals 1))
-          2 (. (. (. startify buffer) (. vals 1)) (. vals 2))
-          3 (. (. (. startify buffer) (. vals 1)) (. vals 2) (. vals 3)))))
+          1 (?. (?. startify buffer) (. vals 1))
+          2 (?. (?. (?. startify buffer) (. vals 1)) (. vals 2))
+          3 (?. (?. (?. startify buffer) (. vals 1)) (. vals 2) (. vals 3)))))
 
 ;;; FN: Set value(s) for a startify buffer
 ;;; @buffer: Number -- represents a buffer

@@ -23,11 +23,70 @@ local function get_value(buffer, ...)
   local vals = {...}
   local _1_ = #vals
   if (_1_ == 1) then
-    return startify[buffer][vals[1]]
+    local t_2_
+    do
+      local t_3_ = startify
+      if (nil ~= t_3_) then
+        t_3_ = (t_3_)[buffer]
+      else
+      end
+      t_2_ = t_3_
+    end
+    if (nil ~= t_2_) then
+      t_2_ = (t_2_)[vals[1]]
+    else
+    end
+    return t_2_
   elseif (_1_ == 2) then
-    return (startify[buffer][vals[1]])[vals[2]]
+    local t_6_
+    do
+      local t_7_
+      do
+        local t_8_ = startify
+        if (nil ~= t_8_) then
+          t_8_ = (t_8_)[buffer]
+        else
+        end
+        t_7_ = t_8_
+      end
+      if (nil ~= t_7_) then
+        t_7_ = (t_7_)[vals[1]]
+      else
+      end
+      t_6_ = t_7_
+    end
+    if (nil ~= t_6_) then
+      t_6_ = (t_6_)[vals[2]]
+    else
+    end
+    return t_6_
   elseif (_1_ == 3) then
-    return (startify[buffer][vals[1]])[vals[2]][vals[3]]
+    local t_12_
+    do
+      local t_13_
+      do
+        local t_14_ = startify
+        if (nil ~= t_14_) then
+          t_14_ = (t_14_)[buffer]
+        else
+        end
+        t_13_ = t_14_
+      end
+      if (nil ~= t_13_) then
+        t_13_ = (t_13_)[vals[1]]
+      else
+      end
+      t_12_ = t_13_
+    end
+    if (nil ~= t_12_) then
+      t_12_ = (t_12_)[vals[2]]
+    else
+    end
+    if (nil ~= t_12_) then
+      t_12_ = (t_12_)[vals[3]]
+    else
+    end
+    return t_12_
   else
     return nil
   end
@@ -52,7 +111,7 @@ local function remove_from_seq_tbl(seq, key)
 end
 _2amodule_locals_2a["remove-from-seq-tbl"] = remove_from_seq_tbl
 local function update_oldfiles(file)
-  local function _4_()
+  local function _21_()
     local result_2_auto = vim.fn.exists("v:oldfiles")
     if (result_2_auto == 0) then
       return false
@@ -60,7 +119,7 @@ local function update_oldfiles(file)
       return true
     end
   end
-  if ((vim.g.startify_locked == 0) or (vim.g.startify_locked == nil) or _4_()) then
+  if ((vim.g.startify_locked == 0) or (vim.g.startify_locked == nil) or _21_()) then
     remove_from_seq_tbl(vim.v.oldfiles, file)
     return table.insert(vim.v.oldfiles, 0, file)
   else
@@ -76,16 +135,16 @@ _G.startify_lastline = function(buffer)
   return lastline(buffer)
 end
 local separator
-local _7_
+local _24_
 do
   local result_2_auto = vim.fn.has("win32")
   if (result_2_auto == 0) then
-    _7_ = false
+    _24_ = false
   else
-    _7_ = true
+    _24_ = true
   end
 end
-if _7_ then
+if _24_ then
   separator = "\\"
 else
   separator = "/"
@@ -123,14 +182,14 @@ _2amodule_2a["center-align-window"] = center_align_window0
 local function right_align_window0(content, padding)
   local win_width = vim.api.nvim_win_get_width(0)
   local content_width = #content
-  local function _11_()
+  local function _28_()
     if padding then
       return padding
     else
       return 0
     end
   end
-  return (win_width - content_width - _11_())
+  return (win_width - content_width - _28_())
 end
 _2amodule_2a["right-align-window"] = right_align_window0
 local function left_align_window(content, padding)
@@ -152,14 +211,14 @@ local function right_align_page(content, padding)
   local content_width = #content
   local page_width = config.opts.format["page-width"]
   local page_margin = math.floor(((win_width - page_width) / 2))
-  local function _12_()
+  local function _29_()
     if padding then
       return padding
     else
       return 0
     end
   end
-  return (page_margin + (page_width - content_width - _12_()))
+  return (page_margin + (page_width - content_width - _29_()))
 end
 _2amodule_2a["right-align-page"] = right_align_page
 local function left_align_page(content, padding)
@@ -171,21 +230,21 @@ local function left_align_page(content, padding)
 end
 _2amodule_2a["left-align-page"] = left_align_page
 local function alignment(align_type, content, padding)
-  local _13_ = align_type
-  if (_13_ == "right-window") then
+  local _30_ = align_type
+  if (_30_ == "right-window") then
     return right_align_window0(content, padding)
-  elseif (_13_ == "right-page") then
+  elseif (_30_ == "right-page") then
     return right_align_page(content, padding)
-  elseif (_13_ == "left-window") then
+  elseif (_30_ == "left-window") then
     return left_align_window(content, padding)
-  elseif (_13_ == "left-page") then
+  elseif (_30_ == "left-page") then
     return left_align_page(content, padding)
-  elseif (_13_ == "center-window") then
+  elseif (_30_ == "center-window") then
     return center_align_window0(content)
-  elseif (_13_ == "center-page") then
+  elseif (_30_ == "center-page") then
     return center_align_page(content)
   elseif true then
-    local _1 = _13_
+    local _1 = _30_
     vim.notify("Invalid alignment value", vim.log.levels.ERROR)
     return 0
   else
@@ -215,17 +274,27 @@ local function add_line(buffer, content, pos, format)
     align = config.opts.format.align
   end
   local padding
-  local function _17_()
+  local function _34_()
     if format.padding then
       return format.padding
     else
       return config.opts.format.padding
     end
   end
-  padding = alignment(align, content, _17_())
+  padding = alignment(align, content, _34_())
   local padded_content = string.format("%s%s", padded_string(padding), content)
   local pos0 = (pos - 1)
   return vim.api.nvim_buf_set_lines(buffer, pos0, pos0, false, {padded_content})
 end
 _2amodule_2a["add-line"] = add_line
+local function recent_files(file_number)
+  local output = {}
+  local oldfiles = vim.v.oldfiles
+  for i = 1, file_number do
+    output[i] = oldfiles[i]
+  end
+  print(vim.inspect(output))
+  return output
+end
+_2amodule_2a["recent-files"] = recent_files
 return _2amodule_2a

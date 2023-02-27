@@ -11,12 +11,13 @@ do
   _2amodule_locals_2a = (_2amodule_2a)["aniseed/locals"]
 end
 local autoload = (require("nvim-startify.aniseed.autoload")).autoload
-local buf, config, extmark, file, index, _, _0 = autoload("nvim-startify.utils.buffer"), autoload("nvim-startify.utils.config"), autoload("nvim-startify.utils.extmark"), autoload("nvim-startify.utils.file"), autoload("nvim-startify.utils.index"), nil, nil
+local buf, config, extmark, file, index, iter, _, _0 = autoload("nvim-startify.utils.buffer"), autoload("nvim-startify.utils.config"), autoload("nvim-startify.utils.extmark"), autoload("nvim-startify.utils.file"), autoload("nvim-startify.utils.index"), autoload("nvim-startify.render.iterator"), nil, nil
 _2amodule_locals_2a["buf"] = buf
 _2amodule_locals_2a["config"] = config
 _2amodule_locals_2a["extmark"] = extmark
 _2amodule_locals_2a["file"] = file
 _2amodule_locals_2a["index"] = index
+_2amodule_locals_2a["iter"] = iter
 _2amodule_locals_2a["_"] = _0
 _2amodule_locals_2a["_"] = _0
 local function init(on_vimenter)
@@ -31,6 +32,7 @@ local function init(on_vimenter)
     print("STARTIFY  RUN")
     vim.api.nvim_win_set_buf(0, buffer)
     buf.start(buffer)
+    iter.loop(buffer)
     return buf.unmodify(buffer)
   else
     vim.api.nvim_delete_buffer(buffer)

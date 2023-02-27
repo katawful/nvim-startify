@@ -59,8 +59,7 @@
       ;; make sure there's a state and continue it
       (if (?. (?. (. file.startify buffer) :global-index-state) 1)
         ;; get next index (doesn't matter if custom)
-        (do
-          (inc-and-return buffer))
+        (do (inc-and-return buffer))
         ;; gotta create the index and return the first index
         (do (create buffer)
             (inc-and-return buffer))))

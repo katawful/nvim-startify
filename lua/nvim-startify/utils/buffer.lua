@@ -40,7 +40,7 @@ local function modifiable_3f(buffer)
   end
 end
 _2amodule_2a["modifiable?"] = modifiable_3f
-local startify_opts = {bufhidden = "wipe", colorcolumn = "0", foldcolumn = "0", matchpairs = "", signcolumn = "no", readonly = false, swapfile = false, relativenumber = false, list = false, spell = false, cursorcolumn = false, number = false, cursorline = false, buflisted = false}
+local startify_opts = {bufhidden = "wipe", colorcolumn = "0", foldcolumn = "0", matchpairs = "", signcolumn = "no", cursorline = false, buflisted = false, list = false, readonly = false, swapfile = false, spell = false, relativenumber = false, cursorcolumn = false, number = false}
 _2amodule_2a["startify-opts"] = startify_opts
 local function set_options(buffer)
   for opt, val in pairs(startify_opts) do
