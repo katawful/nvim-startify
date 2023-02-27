@@ -19,11 +19,11 @@
       (if (= (. (. vim scope) var-name) 0) falsy
           (> (. (. vim scope) var-name) 0) truthy))
 
-;; Key-val: A table of values used in startify options
+;;; Key-val: A table of values used in startify options
 (def value {:relative-path ":~:."
             :absolute-path ":p:~"})
 
-;; Key-val: A table of default configuration values for startify
+;;; Key-val: A table of default configuration values for startify
 (def default {:transformations (or (get-var :g :startify_transformations) [])
               :bookmarks (or (get-var :g :startify_bookmarks) [])
               :display-lists (or (get-var :g :startify_lists)
@@ -33,7 +33,7 @@
                                   {:type :bookmarks :header "   Bookmarks"}
                                   {:type :commands :header "   Commands"}])
               :commands (or (get-var :g :startify_commands) [])
-              :custom-index (or (get-var :g :startify_custom_indices) [])
+              :custom-index (or (get-var :g :startify_custom_indices) nil)
               :custom-header (if (get-var :g :startify_custom_header)
                                  (do (vim.notify "vim.g.startify_custom_header must be converted manually
 Defaulting to an empty value" vim.log.levels.WARN) [""])
@@ -114,12 +114,13 @@ Defaulting to an empty value" vim.log.levels.WARN) [""])
                                              (handle-vim-var :startify_update_old_files :g
                                                              true false)
                                              false)}
-              :format {:top-padding 1
-                       :alignment :center
-                       :left-padding (or (get-var :g :startify_padding_left) 3)
-                       :width 80}
-              :render-order [:header :special
-                             :lists :footer]})
+              :format {:align :center-page
+                       :padding (or (get-var :g :startify_padding_left) 3)
+                       :page-width 80
+                       :above-spacing 1
+                       :below-spacing 0}
+              :render-order [[:title-global-files :title]
+                             [:list-most-recent-files :list]]})
 
 ;;; Key-val: Table of configuration values
 (def opts {})
@@ -127,7 +128,7 @@ Defaulting to an empty value" vim.log.levels.WARN) [""])
 ;;; FN: Return value from config table
 ;;; @value: String -- The value desired
 ;;; @?nest: String -- The nested table value
-(fn _G.startify_value [value ?nest] "Return a vlaue from the config table
+(fn _G.startify_value [value ?nest] "Return a value from the config table
 @value: String -- The value desired
 @?nest: String -- The nested table value"
       (if ?nest
