@@ -261,3 +261,12 @@ The full IFY implementation uses this function repeatedly
                                     pos
                                     false
                                     [padded-content])))
+
+;;; FN: Grab the most recent files
+;;; @file-number: Number -- the amount of recent files to return
+(defn recent-files [file-number]
+      (let [output []
+            oldfiles vim.v.oldfiles]
+        (for [i 1 file-number]
+          (tset output i (. oldfiles i)))
+        output))
