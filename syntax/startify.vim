@@ -10,7 +10,6 @@ if exists("b:current_syntax")
 endif
 
 let s:sep = v:lua.startify_fn_separator()
-echom s:sep
 let s:raw_padding = v:lua.startify_value("left_padding", "format")
 let s:padding_left = repeat(' ', s:raw_padding)
 
