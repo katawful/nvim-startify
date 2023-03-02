@@ -44,12 +44,13 @@
             names (if ify.names ify.names
                     ify.entries)]
         (for [i 1 entries-length]
-          (file.add-line buffer
-                         (string.format builtin.key-string
-                                        (index.get-next buffer)
-                                        (. names i))
-                         file.startify.current-line
-                         format)
+          (file.add-entry-line buffer
+                               (file.pad-key-string
+                                 (index.get-next buffer)
+                                 (. names i)
+                                 format)
+                               file.startify.current-line
+                               format)
           (set file.startify.current-line (+ file.startify.current-line 1)))))
 
 ;;; FN: loop through a list IFY

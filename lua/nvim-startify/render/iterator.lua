@@ -51,7 +51,7 @@ local function entries_loop(buffer, ify, format)
     names = ify.entries
   end
   for i = 1, entries_length do
-    file["add-line"](buffer, string.format(builtin["key-string"], index["get-next"](buffer), names[i]), file.startify["current-line"], format)
+    file["add-entry-line"](buffer, file["pad-key-string"](index["get-next"](buffer), names[i], format), file.startify["current-line"], format)
     file.startify["current-line"] = (file.startify["current-line"] + 1)
   end
   return nil

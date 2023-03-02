@@ -4,8 +4,10 @@
 
 ;;; Module: built in IFYs
 
-;;; String: formatted string that builds '[%s] %s'
-(def key-string "[%s] %s")
+;;; String: formatted string that builds '[%s]%s %s'
+;;; This lets us have the keymap bracket be on its own thing
+;;; We will need to explore changing this to be customizable at some point
+(def key-string "[%s]%s%s")
 
 ;;; IFY: List -- a list of the most recently used files
 (def list-most-recent-files

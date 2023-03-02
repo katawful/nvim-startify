@@ -1,6 +1,7 @@
 (module nvim-startify.utils.file
         {autoload {a nvim-startify.aniseed.core
                    config nvim-startify.utils.config
+                   builtin nvim-startify.render.builtins
                    fortune nvim-startify.fortune.init}
          require-macros [nvim-startify.katcros-fnl.macros.nvim.api.options.macros
                          nvim-startify.katcros-fnl.macros.nvim.api.utils.macros]})
@@ -97,22 +98,6 @@ Returns amount inserted
 Returns amount inserted"
       (for [i 1 amount]
         (vim.api.nvim_buf_set_lines buffer -1 -1 false [""])))
-
-;;; FN: Pad for center alignment of the window
-;;; Returns amount of padding for center alignment
-(defn center-align-window [] "Pad for center alignment
-Returns amount of padding for center alignment"
-      (let [win-width (vim.api.nvim_win_get_width 0)
-            content-width config.opts.width]
-        (math.floor (/ (- win-width content-width) 2))))
-
-;;; FN: Pad for right alignment of the window
-;;; Returns amount of padding for right alignment
-(defn right-align-window [] "Pad for right alignment
-Returns amount of padding for right alignment"
-      (let [win-width (vim.api.nvim_win_get_width 0)
-            content-width config.opts.width]
-        (- win-width content-width)))
 
 ;;; FN: Get amount of padding for center to window alignment
 ;;; @content: String -- the line that needs padding
@@ -240,6 +225,43 @@ Returns whitespace string"
         (for [i 1 amount] (set str (.. str " ")))
         str))
 
+;;; FN: Padded whitespace string for keymap string '[%s]%s%s'
+;;; 1 - keymap
+;;; 2 - padding to content
+;;; 3 - content
+;;; The key strings should all be at the same column
+;;; We will keep the keymap string at the edges of the page
+;;; Padding on the keymap will be allowed likely
+;;; @keymap: String -- the keys to present
+;;; @content: String -- the line that needs to be added
+;;; @format: Text format table
+(defn pad-key-string [keymap content format] "Pad a key string
+This will align the key string with the left page or window only
+@keymap: String -- the keys to present
+@content: String -- the line that needs to be added
+@format: Text format table"
+      (let [key-string builtin.key-string
+            padding (or format.padding config.opts.format.padding)
+            align (or format.align config.opts.format.align)
+            win-or-page (if (string.find align :window) :win :page)
+            page-padding (if (= win-or-page :win)
+                           (left-align-window key-string padding)
+                           (left-align-page key-string padding))
+            aligned-key-string (string.format "%s%s"
+                                        (padded-string page-padding)
+                                        key-string)
+            ;; We need to factor in how the page is rendered
+            win-width (vim.api.nvim_win_get_width 0)
+            page-width config.opts.format.page-width
+            page-margin (if (= win-or-page :page)
+                          (math.floor (/ (- win-width page-width) 2))
+                          0)
+            keymap-length (string.len (tostring keymap))
+            content-padding (padded-string
+                              (- (alignment align content padding)
+                                 keymap-length page-margin 2 padding))]
+        (string.format aligned-key-string keymap content-padding content)))
+
 ;;; FN: Add a line of content to startify buffer
 ;;; @buffer: Number -- represents a buffer
 ;;; @content: String -- a single line of text to add to file
@@ -265,6 +287,26 @@ The full IFY implementation uses this function repeatedly
                                     pos
                                     false
                                     [padded-content])))
+
+;;; FN: Add an entry line to buffer
+;;; This skips an alignment step
+;;; @buffer: Number -- represents a buffer
+;;; @content: String -- a single line of text to add to file
+;;; @pos: Number -- the line number to place content
+;;; @format: Key/val -- a formatting table
+(defn add-entry-line [buffer content pos format] "Adds an entry line to buffer
+This skips alignment as it is passed to keymap padding
+This only adds a line to the buffer
+The full IFY implementation uses this function repeatedly
+@buffer: Number -- represents a buffer
+@contents: String -- a single line of text to add to file
+@format: Key/val -- a formatting table"
+      (let [pos (- pos 1)] ; nvim api is 0 index which is confusing
+        (vim.api.nvim_buf_set_lines buffer
+                                    pos
+                                    pos
+                                    false
+                                    [content])))
 
 ;;; FN: Grab the most recent files
 ;;; @file-number: Number -- the amount of recent files to return

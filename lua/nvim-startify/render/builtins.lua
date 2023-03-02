@@ -14,7 +14,7 @@ local autoload = (require("nvim-startify.aniseed.autoload")).autoload
 local config, file = autoload("nvim-startify.utils.config"), autoload("nvim-startify.utils.file")
 do end (_2amodule_locals_2a)["config"] = config
 _2amodule_locals_2a["file"] = file
-local key_string = "[%s] %s"
+local key_string = "[%s]%s%s"
 _2amodule_2a["key-string"] = key_string
 local list_most_recent_files = {type = "file", entries = file["recent-files"](config.opts.settings["list-number"])}
 _2amodule_2a["list-most-recent-files"] = list_most_recent_files

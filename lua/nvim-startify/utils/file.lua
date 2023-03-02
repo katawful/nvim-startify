@@ -11,8 +11,9 @@ do
   _2amodule_locals_2a = (_2amodule_2a)["aniseed/locals"]
 end
 local autoload = (require("nvim-startify.aniseed.autoload")).autoload
-local a, config, fortune, _, _0 = autoload("nvim-startify.aniseed.core"), autoload("nvim-startify.utils.config"), autoload("nvim-startify.fortune.init"), nil, nil
+local a, builtin, config, fortune, _, _0 = autoload("nvim-startify.aniseed.core"), autoload("nvim-startify.render.builtins"), autoload("nvim-startify.utils.config"), autoload("nvim-startify.fortune.init"), nil, nil
 _2amodule_locals_2a["a"] = a
+_2amodule_locals_2a["builtin"] = builtin
 _2amodule_locals_2a["config"] = config
 _2amodule_locals_2a["fortune"] = fortune
 _2amodule_locals_2a["_"] = _0
@@ -160,26 +161,14 @@ local function insert_blankline(buffer, amount)
   return nil
 end
 _2amodule_2a["insert-blankline"] = insert_blankline
-local function center_align_window()
-  local win_width = vim.api.nvim_win_get_width(0)
-  local content_width = config.opts.width
-  return math.floor(((win_width - content_width) / 2))
-end
-_2amodule_2a["center-align-window"] = center_align_window
-local function right_align_window()
-  local win_width = vim.api.nvim_win_get_width(0)
-  local content_width = config.opts.width
-  return (win_width - content_width)
-end
-_2amodule_2a["right-align-window"] = right_align_window
-local function center_align_window0(content)
+local function center_align_window(content)
   local win_width = vim.api.nvim_win_get_width(0)
   local content_middle = math.floor((#content / 2))
   local win_middle = math.floor((win_width / 2))
   return (win_middle - content_middle)
 end
-_2amodule_2a["center-align-window"] = center_align_window0
-local function right_align_window0(content, padding)
+_2amodule_2a["center-align-window"] = center_align_window
+local function right_align_window(content, padding)
   local win_width = vim.api.nvim_win_get_width(0)
   local content_width = #content
   local function _28_()
@@ -191,7 +180,7 @@ local function right_align_window0(content, padding)
   end
   return (win_width - content_width - _28_())
 end
-_2amodule_2a["right-align-window"] = right_align_window0
+_2amodule_2a["right-align-window"] = right_align_window
 local function left_align_window(content, padding)
   return padding
 end
@@ -232,7 +221,7 @@ _2amodule_2a["left-align-page"] = left_align_page
 local function alignment(align_type, content, padding)
   local _30_ = align_type
   if (_30_ == "right-window") then
-    return right_align_window0(content, padding)
+    return right_align_window(content, padding)
   elseif (_30_ == "right-page") then
     return right_align_page(content, padding)
   elseif (_30_ == "left-window") then
@@ -240,7 +229,7 @@ local function alignment(align_type, content, padding)
   elseif (_30_ == "left-page") then
     return left_align_page(content, padding)
   elseif (_30_ == "center-window") then
-    return center_align_window0(content)
+    return center_align_window(content)
   elseif (_30_ == "center-page") then
     return center_align_page(content)
   elseif true then
@@ -266,6 +255,36 @@ local function padded_string(amount)
   return str
 end
 _2amodule_2a["padded-string"] = padded_string
+local function pad_key_string(keymap, content, format)
+  local key_string = builtin["key-string"]
+  local padding = (format.padding or config.opts.format.padding)
+  local align = (format.align or config.opts.format.align)
+  local win_or_page
+  if string.find(align, "window") then
+    win_or_page = "win"
+  else
+    win_or_page = "page"
+  end
+  local page_padding
+  if (win_or_page == "win") then
+    page_padding = left_align_window(key_string, padding)
+  else
+    page_padding = left_align_page(key_string, padding)
+  end
+  local aligned_key_string = string.format("%s%s", padded_string(page_padding), key_string)
+  local win_width = vim.api.nvim_win_get_width(0)
+  local page_width = config.opts.format["page-width"]
+  local page_margin
+  if (win_or_page == "page") then
+    page_margin = math.floor(((win_width - page_width) / 2))
+  else
+    page_margin = 0
+  end
+  local keymap_length = string.len(tostring(keymap))
+  local content_padding = padded_string((alignment(align, content, padding) - keymap_length - page_margin - 2 - padding))
+  return string.format(aligned_key_string, keymap, content_padding, content)
+end
+_2amodule_2a["pad-key-string"] = pad_key_string
 local function add_line(buffer, content, pos, format)
   local align
   if format.align then
@@ -274,26 +293,30 @@ local function add_line(buffer, content, pos, format)
     align = config.opts.format.align
   end
   local padding
-  local function _34_()
+  local function _37_()
     if format.padding then
       return format.padding
     else
       return config.opts.format.padding
     end
   end
-  padding = alignment(align, content, _34_())
+  padding = alignment(align, content, _37_())
   local padded_content = string.format("%s%s", padded_string(padding), content)
   local pos0 = (pos - 1)
   return vim.api.nvim_buf_set_lines(buffer, pos0, pos0, false, {padded_content})
 end
 _2amodule_2a["add-line"] = add_line
+local function add_entry_line(buffer, content, pos, format)
+  local pos0 = (pos - 1)
+  return vim.api.nvim_buf_set_lines(buffer, pos0, pos0, false, {content})
+end
+_2amodule_2a["add-entry-line"] = add_entry_line
 local function recent_files(file_number)
   local output = {}
   local oldfiles = vim.v.oldfiles
   for i = 1, file_number do
     output[i] = oldfiles[i]
   end
-  print(vim.inspect(output))
   return output
 end
 _2amodule_2a["recent-files"] = recent_files
