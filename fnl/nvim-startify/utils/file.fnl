@@ -308,6 +308,31 @@ The full IFY implementation uses this function repeatedly
                                     false
                                     [content])))
 
+;;; FN: Add an art string to line
+;;; @buffer: Number -- represents a buffer
+;;; @content: String -- a single line of text to add to file
+;;; @pos: Number -- the line number to place content
+;;; @format: Key/val -- a formatting table
+;;; @width: Number -- the size that the string is, for art IFYs
+(defn add-string-line [buffer content pos format width] "Adds a string to buffer
+This only adds a line to the buffer
+The full IFY implementation uses this function repeatedly
+@buffer: Number -- represents a buffer
+@contents: String -- a single line of text to add to file
+@format: Key/val -- a formatting table"
+      (let [align (or format.align config.opts.format.align)
+            padding (alignment align (padded-string width)
+                               (or format.padding config.opts.format.padding))
+            padded-content (string.format "%s%s"
+                                          (padded-string padding)
+                                          content)
+            pos (- pos 1)] ; nvim api is 0 index which is confusing
+        (vim.api.nvim_buf_set_lines buffer
+                                    pos
+                                    pos
+                                    false
+                                    [padded-content])))
+
 ;;; FN: Grab the most recent files
 ;;; @file-number: Number -- the amount of recent files to return
 (defn recent-files [file-number]

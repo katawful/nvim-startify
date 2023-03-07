@@ -311,6 +311,14 @@ local function add_entry_line(buffer, content, pos, format)
   return vim.api.nvim_buf_set_lines(buffer, pos0, pos0, false, {content})
 end
 _2amodule_2a["add-entry-line"] = add_entry_line
+local function add_string_line(buffer, content, pos, format, width)
+  local align = (format.align or config.opts.format.align)
+  local padding = alignment(align, padded_string(width), (format.padding or config.opts.format.padding))
+  local padded_content = string.format("%s%s", padded_string(padding), content)
+  local pos0 = (pos - 1)
+  return vim.api.nvim_buf_set_lines(buffer, pos0, pos0, false, {padded_content})
+end
+_2amodule_2a["add-string-line"] = add_string_line
 local function recent_files(file_number)
   local output = {}
   local oldfiles = vim.v.oldfiles
