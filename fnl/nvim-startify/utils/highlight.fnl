@@ -12,32 +12,32 @@
 
 ;;; The following functions return specific values from the highlight table
 
-(defn group [table] "Get the group name of a highlight group" (?. table :group))
+(defn get-group [table] "Get the group name of a highlight group" (?. table :group))
 
-(defn gui-fg [table] "Get the gui foreground of a highlight group"
+(defn get-gui-fg [table] "Get the gui foreground of a highlight group"
       (?. table :fg))
 
-(defn gui-bg [table] "Get the gui background of a highlight group"
+(defn get-gui-bg [table] "Get the gui background of a highlight group"
       (?. table :bg))
 
-(defn term-fg [table] "Get the term foreground of a highlight group"
+(defn get-term-fg [table] "Get the term foreground of a highlight group"
       (?. table :ctermfg))
 
-(defn term-bg [table] "Get the term background of a highlight group"
+(defn get-term-bg [table] "Get the term background of a highlight group"
       (?. table :ctermbg))
 
-(defn special [table] "Get the special colors of a highlight group"
+(defn get-special [table] "Get the special colors of a highlight group"
       (?. table :sp))
 
-(defn blend [table] "Get the blend of a highlight group" (?. table :blend))
+(defn get-blend [table] "Get the blend of a highlight group" (?. table :blend))
 
-(defn link [table] "Get the linking group for a highlight group"
+(defn get-link [table] "Get the linking group for a highlight group"
       (?. table :link))
 
-(defn default [table] "Get default key for a highlight group"
+(defn get-default [table] "Get default key for a highlight group"
       (?. table :default))
 
-(defn all-attr->table [table#] "Get the boolean attributes of a highlight group
+(defn get-all-attr->table [table#] "Get the boolean attributes of a highlight group
   as a table"
       (let [output {}]
         (each [k v (pairs table#)]
@@ -100,7 +100,7 @@
 ;;; @opts: Key/val -- color highlight table
 (defn overwrite [opts] "Overwrite the values found for a group without clearing them out
 @opts: Key/val -- highlight table"
-      (let [group (get.group opts)
+      (let [group (get-group opts)
             current-hl (get-existing group)
             output (vim.tbl_extend :force current-hl opts)]
         (tset output :group nil)
@@ -117,31 +117,31 @@ highlighting for Neovim 0.7 and newer users
 @namespace: Number -- the extmark namespace
 @opts: Key/val -- highlight table"
       ;; For now assume that a group that has a link will simply be empty otherwise
-      (if (get.link opts)
-          (let [group (get.group opts)
-                link (get.link opts)
+      (if (get-link opts)
+          (let [group (get-group opts)
+                link (get-link opts)
                 args {: link}]
             (vim.api.nvim_set_hl namespace group args))
           ;; Key 'default'
-          (get.default opts)
-          (let [group (get.group opts)
+          (get-default opts)
+          (let [group (get-group opts)
                 args (overwrite opts)]
             (vim.api.nvim_set_hl namespace group args))
-          (let [group (get.group opts)
-                gui-fore (if (and (not= (get.gui-fg opts) nil)
+          (let [group (get-group opts)
+                gui-fore (if (and (not= (get-gui-fg opts) nil)
                                   (not= opts.fg :NONE) (not= opts.fg :SKIP))
                              opts.fg
                              nil)
-                gui-back (if (and (not= (get.gui-bg opts) nil)
+                gui-back (if (and (not= (get-gui-bg opts) nil)
                                   (not= opts.bg :NONE) (not= opts.bg :SKIP))
                              opts.bg
                              nil)
-                c-fore (if (and (not= (get.term-fg opts) nil)
+                c-fore (if (and (not= (get-term-fg opts) nil)
                                 (not= opts.ctermfg :NONE)
                                 (not= opts.ctermfg :SKIP))
                            opts.ctermfg
                            nil)
-                c-back (if (and (not= (get.term-bg opts) nil)
+                c-back (if (and (not= (get-term-bg opts) nil)
                                 (not= opts.ctermbg :NONE)
                                 (not= opts.ctermbg :SKIP))
                            opts.ctermbg
@@ -150,8 +150,8 @@ highlighting for Neovim 0.7 and newer users
                       :bg gui-back
                       :ctermfg c-fore
                       :ctermbg c-back
-                      :special (get.special opts)
-                      :blend (get.blend opts)}]
-            (each [k v (pairs (get.all-attr->table opts))]
+                      :special (get-special opts)
+                      :blend (get-blend opts)}]
+            (each [k v (pairs (get-all-attr->table opts))]
               (tset args k v))
             (vim.api.nvim_set_hl namespace group args))))
