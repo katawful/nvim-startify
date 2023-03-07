@@ -10,9 +10,14 @@ do
   _2amodule_2a["aniseed/locals"] = {}
   _2amodule_locals_2a = (_2amodule_2a)["aniseed/locals"]
 end
+local autoload = (require("nvim-startify.aniseed.autoload")).autoload
+local config, file, s = autoload("nvim-startify.utils.config"), autoload("nvim-startify.utils.file"), autoload("nvim-startify.aniseed.string")
+do end (_2amodule_locals_2a)["config"] = config
+_2amodule_locals_2a["file"] = file
+_2amodule_locals_2a["s"] = s
 local groups = {header = {link = "Title", name = "StartifyHeader"}, special = {link = "Comment", name = "StartifySpecial"}, directory = {link = "Directory", name = "StartifyFile"}}
 _2amodule_2a["groups"] = groups
-local function group(table)
+local function get_group(table)
   local t_1_ = table
   if (nil ~= t_1_) then
     t_1_ = (t_1_).group
@@ -20,8 +25,8 @@ local function group(table)
   end
   return t_1_
 end
-_2amodule_2a["group"] = group
-local function gui_fg(table)
+_2amodule_2a["get-group"] = get_group
+local function get_gui_fg(table)
   local t_3_ = table
   if (nil ~= t_3_) then
     t_3_ = (t_3_).fg
@@ -29,8 +34,8 @@ local function gui_fg(table)
   end
   return t_3_
 end
-_2amodule_2a["gui-fg"] = gui_fg
-local function gui_bg(table)
+_2amodule_2a["get-gui-fg"] = get_gui_fg
+local function get_gui_bg(table)
   local t_5_ = table
   if (nil ~= t_5_) then
     t_5_ = (t_5_).bg
@@ -38,8 +43,8 @@ local function gui_bg(table)
   end
   return t_5_
 end
-_2amodule_2a["gui-bg"] = gui_bg
-local function term_fg(table)
+_2amodule_2a["get-gui-bg"] = get_gui_bg
+local function get_term_fg(table)
   local t_7_ = table
   if (nil ~= t_7_) then
     t_7_ = (t_7_).ctermfg
@@ -47,8 +52,8 @@ local function term_fg(table)
   end
   return t_7_
 end
-_2amodule_2a["term-fg"] = term_fg
-local function term_bg(table)
+_2amodule_2a["get-term-fg"] = get_term_fg
+local function get_term_bg(table)
   local t_9_ = table
   if (nil ~= t_9_) then
     t_9_ = (t_9_).ctermbg
@@ -56,8 +61,8 @@ local function term_bg(table)
   end
   return t_9_
 end
-_2amodule_2a["term-bg"] = term_bg
-local function special(table)
+_2amodule_2a["get-term-bg"] = get_term_bg
+local function get_special(table)
   local t_11_ = table
   if (nil ~= t_11_) then
     t_11_ = (t_11_).sp
@@ -65,8 +70,8 @@ local function special(table)
   end
   return t_11_
 end
-_2amodule_2a["special"] = special
-local function blend(table)
+_2amodule_2a["get-special"] = get_special
+local function get_blend(table)
   local t_13_ = table
   if (nil ~= t_13_) then
     t_13_ = (t_13_).blend
@@ -74,8 +79,8 @@ local function blend(table)
   end
   return t_13_
 end
-_2amodule_2a["blend"] = blend
-local function link(table)
+_2amodule_2a["get-blend"] = get_blend
+local function get_link(table)
   local t_15_ = table
   if (nil ~= t_15_) then
     t_15_ = (t_15_).link
@@ -83,8 +88,8 @@ local function link(table)
   end
   return t_15_
 end
-_2amodule_2a["link"] = link
-local function default(table)
+_2amodule_2a["get-link"] = get_link
+local function get_default(table)
   local t_17_ = table
   if (nil ~= t_17_) then
     t_17_ = (t_17_).default
@@ -92,8 +97,8 @@ local function default(table)
   end
   return t_17_
 end
-_2amodule_2a["default"] = default
-local function all_attr__3etable(table_23)
+_2amodule_2a["get-default"] = get_default
+local function get_all_attr__3etable(table_23)
   local output = {}
   for k, v in pairs(table_23) do
     if ((v == true) or (v == false)) then
@@ -118,12 +123,12 @@ local function all_attr__3etable(table_23)
   end
   return output
 end
-_2amodule_2a["all-attr->table"] = all_attr__3etable
-local function get_existing(group0)
-  local gui = vim.api.nvim_get_hl_by_name(group0, true)
+_2amodule_2a["get-all-attr->table"] = get_all_attr__3etable
+local function get_existing(group)
+  local gui = vim.api.nvim_get_hl_by_name(group, true)
   local fg = utils["decimal-rgb->hex"](gui.foreground)
   local bg = utils["decimal-rgb->hex"](gui.background)
-  local cterm = vim.api.nvim_get_hl_by_name(group0, false)
+  local cterm = vim.api.nvim_get_hl_by_name(group, false)
   local ctermfg = cterm.foreground
   local ctermbg = cterm.background
   local bold
@@ -225,16 +230,16 @@ local function get_existing(group0)
     end
     strikethrough = t_43_
   end
-  local blend0
+  local blend
   do
     local t_45_ = gui
     if (nil ~= t_45_) then
       t_45_ = (t_45_).blend
     else
     end
-    blend0 = t_45_
+    blend = t_45_
   end
-  local special0
+  local special
   local function _48_()
     local t_47_ = gui
     if (nil ~= t_47_) then
@@ -243,13 +248,13 @@ local function get_existing(group0)
     end
     return t_47_
   end
-  special0 = utils["decimal-rgb->hex"](_48_())
-  return {group = group0, fg = fg, bg = bg, ctermbg = ctermbg, ctermfg = ctermfg, bold = bold, underline = underline, underlineline = underlineline, undercurl = undercurl, underdot = underdot, underdash = underdash, inverse = inverse, italic = italic, nocombine = nocombine, standout = standout, strikethrough = strikethrough, blend = blend0, special = special0}
+  special = utils["decimal-rgb->hex"](_48_())
+  return {group = group, fg = fg, bg = bg, ctermbg = ctermbg, ctermfg = ctermfg, bold = bold, underline = underline, underlineline = underlineline, undercurl = undercurl, underdot = underdot, underdash = underdash, inverse = inverse, italic = italic, nocombine = nocombine, standout = standout, strikethrough = strikethrough, blend = blend, special = special}
 end
 _2amodule_2a["get-existing"] = get_existing
 local function overwrite(opts)
-  local group0 = get.group(opts)
-  local current_hl = get_existing(group0)
+  local group = get_group(opts)
+  local current_hl = get_existing(group)
   local output = vim.tbl_extend("force", current_hl, opts)
   do end (output)["group"] = nil
   output["default"] = nil
@@ -257,47 +262,80 @@ local function overwrite(opts)
 end
 _2amodule_2a["overwrite"] = overwrite
 local function highlight(namespace, opts)
-  if get.link(opts) then
-    local group0 = get.group(opts)
-    local link0 = get.link(opts)
-    local args = {link = link0}
-    return vim.api.nvim_set_hl(namespace, group0, args)
-  elseif get.default(opts) then
-    local group0 = get.group(opts)
+  if get_link(opts) then
+    local group = get_group(opts)
+    local link = get_link(opts)
+    local args = {link = link}
+    return vim.api.nvim_set_hl(namespace, group, args)
+  elseif get_default(opts) then
+    local group = get_group(opts)
     local args = overwrite(opts)
-    return vim.api.nvim_set_hl(namespace, group0, args)
+    return vim.api.nvim_set_hl(namespace, group, args)
   else
-    local group0 = get.group(opts)
+    local group = get_group(opts)
     local gui_fore
-    if ((get["gui-fg"](opts) ~= nil) and (opts.fg ~= "NONE") and (opts.fg ~= "SKIP")) then
+    if ((get_gui_fg(opts) ~= nil) and (opts.fg ~= "NONE") and (opts.fg ~= "SKIP")) then
       gui_fore = opts.fg
     else
       gui_fore = nil
     end
     local gui_back
-    if ((get["gui-bg"](opts) ~= nil) and (opts.bg ~= "NONE") and (opts.bg ~= "SKIP")) then
+    if ((get_gui_bg(opts) ~= nil) and (opts.bg ~= "NONE") and (opts.bg ~= "SKIP")) then
       gui_back = opts.bg
     else
       gui_back = nil
     end
     local c_fore
-    if ((get["term-fg"](opts) ~= nil) and (opts.ctermfg ~= "NONE") and (opts.ctermfg ~= "SKIP")) then
+    if ((get_term_fg(opts) ~= nil) and (opts.ctermfg ~= "NONE") and (opts.ctermfg ~= "SKIP")) then
       c_fore = opts.ctermfg
     else
       c_fore = nil
     end
     local c_back
-    if ((get["term-bg"](opts) ~= nil) and (opts.ctermbg ~= "NONE") and (opts.ctermbg ~= "SKIP")) then
+    if ((get_term_bg(opts) ~= nil) and (opts.ctermbg ~= "NONE") and (opts.ctermbg ~= "SKIP")) then
       c_back = opts.ctermbg
     else
       c_back = nil
     end
-    local args = {fg = gui_fore, bg = gui_back, ctermfg = c_fore, ctermbg = c_back, special = get.special(opts), blend = get.blend(opts)}
-    for k, v in pairs(get["all-attr->table"](opts)) do
+    local args = {fg = gui_fore, bg = gui_back, ctermfg = c_fore, ctermbg = c_back, special = get_special(opts), blend = get_blend(opts)}
+    for k, v in pairs(get_all_attr__3etable(opts)) do
       args[k] = v
     end
-    return vim.api.nvim_set_hl(namespace, group0, args)
+    return vim.api.nvim_set_hl(namespace, group, args)
   end
 end
 _2amodule_2a["highlight"] = highlight
+local function gen_hl_group(ify)
+  if file.startify["hl-group"] then
+    local out = string.format("Startify_%s_%s", ify, file.startify["hl-group"])
+    do local _ = (file.startify["hl-group"] + 1) end
+    return out
+  else
+    file.startify["hl-group"] = 1
+    local out = string.format("Startify_%s_%s", ify, file.startify["hl-group"])
+    do local _ = (file.startify["hl-group"] + 1) end
+    return out
+  end
+end
+_2amodule_2a["gen-hl-group"] = gen_hl_group
+local function str(ify_string, ify)
+  local out_string = {}
+  if (type(ify_string) == "table") then
+    for _, sub_string in ipairs(ify_string) do
+      if (type(sub_string) == "table") then
+        table.insert(out_string, sub_string[1])
+        local hl_group = gen_hl_group(ify)
+        local color_table = sub_string[2]
+        color_table["group"] = hl_group
+        highlight(file.startify.namespace, color_table)
+      else
+        table.insert(out_string, sub_string)
+      end
+    end
+  else
+    table.insert(out_string, ify_string)
+  end
+  return s.join(out_string)
+end
+_2amodule_2a["str"] = str
 return _2amodule_2a

@@ -1,4 +1,7 @@
-(module nvim-startify.utils.highlight)
+(module nvim-startify.utils.highlight
+        {autoload {file nvim-startify.utils.file
+                   config nvim-startify.utils.config
+                   s nvim-startify.aniseed.string}})
 
 ;;; Module: Handle highlighting
 
@@ -155,3 +158,53 @@ highlighting for Neovim 0.7 and newer users
             (each [k v (pairs (get-all-attr->table opts))]
               (tset args k v))
             (vim.api.nvim_set_hl namespace group args))))
+
+;;; FN: Generates a unique, non-random hl group name
+;;; This group can be used for unique components of an IFY
+;;; This way we don't overload anything, but can also change out
+;;; -- the group's components as needed
+;;; The naming scheme is like so: Startify_IFY_1
+;;; The first word is just a signifier for this plugin
+;;; The second word is the type of IFY it is for
+;;; The last item is an index that gets updated based on access
+;;; @ify: String -- type of ify
+(defn gen-hl-group [ify]
+      ;; See if file.startify.hl-group exists
+      (if file.startify.hl-group
+        (do
+          (let [out (string.format "Startify_%s_%s" ify file.startify.hl-group)]
+            (+ file.startify.hl-group 1)
+            out))
+        (do
+          (set file.startify.hl-group 1)
+          (let [out (string.format "Startify_%s_%s" ify file.startify.hl-group)]
+            (+ file.startify.hl-group 1)
+            out))))
+
+;;; FN: Highlight any conjoined-color-string-tables and return the string line
+;;; Each index of an art IFY's string key is a line to print
+;;; There can be an unlimited number of CCST in each index
+;;; We need to be able to print the single line of string
+;;; We also need to highlight each part of the CCST if it exists
+;;; @ify-string: String/seq-table -- The line from the IFY
+;;; @ify: String -- what IFY we are using
+(defn str [ify-string ify]
+      (let [out-string []]
+        (if (= (type ify-string) :table)
+          (each [_ sub-string (ipairs ify-string)]
+            ;; Handle CCST
+            (if (= (type sub-string) :table)
+              (do
+                ;; Add string to output
+                (table.insert out-string (. sub-string 1))
+                ;; Highlight color-table
+                (let [hl-group (gen-hl-group ify)
+                      color-table (. sub-string 2)]
+                  (tset color-table :group hl-group)
+                  (highlight file.startify.namespace color-table)))
+              (do
+                ;; Handle non-CCST
+                (table.insert out-string sub-string))))
+          ;; Handle non-CCST
+          (table.insert out-string ify-string))
+        (s.join out-string)))
