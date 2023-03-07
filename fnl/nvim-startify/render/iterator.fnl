@@ -1,5 +1,6 @@
 (module nvim-startify.render.iterator
         {autoload {file nvim-startify.utils.file
+                   highlight nvim-startify.utils.highlight
                    config nvim-startify.utils.config
                    index nvim-startify.utils.index
                    builtin nvim-startify.render.builtins}})
@@ -71,10 +72,37 @@
                (+ file.startify.current-line
                   merged-format.below-spacing)))))
 
+;;; FN: loop through the entries key in a art IFY
+;;; @buffer: Number -- represents a buffer
+;;; @art-ify: IFY -- an art IFY
+;;; @format: Key/val -- the format table already created
+(defn art-loop [buffer ify format]
+      (let [height (. ify.size 2)]
+        (for [i 1 height]
+          (file.add-string-line buffer
+                                (highlight.str (. ify.string i) :art)
+                                file.startify.current-line
+                                format
+                                (. ify.size 1))
+          (set file.startify.current-line (+ file.startify.current-line 1)))))
 
 ;;; FN: loop through a art IFY
 ;;; @buffer: Number -- represents a buffer
-(defn art-ify-loop [buffer art-ify])
+(defn art-ify-loop [buffer ify]
+      (let [ify-format (if (?. ify :format)
+                         ify.format {})
+            merged-format (vim.tbl_extend :keep
+                                          ify-format
+                                          config.opts.format)]
+        (when merged-format.above-spacing
+          (set file.startify.current-line
+               (+ file.startify.current-line
+                  merged-format.above-spacing)))
+        (art-loop buffer ify merged-format)
+        (when merged-format.below-spacing
+          (set file.startify.current-line
+               (+ file.startify.current-line
+                  merged-format.below-spacing)))))
 
 ;;; FN: Loop through a group
 ;;; @buffer: Number -- represents a buffer

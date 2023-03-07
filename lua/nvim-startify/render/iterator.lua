@@ -11,10 +11,11 @@ do
   _2amodule_locals_2a = (_2amodule_2a)["aniseed/locals"]
 end
 local autoload = (require("nvim-startify.aniseed.autoload")).autoload
-local builtin, config, file, index = autoload("nvim-startify.render.builtins"), autoload("nvim-startify.utils.config"), autoload("nvim-startify.utils.file"), autoload("nvim-startify.utils.index")
+local builtin, config, file, highlight, index = autoload("nvim-startify.render.builtins"), autoload("nvim-startify.utils.config"), autoload("nvim-startify.utils.file"), autoload("nvim-startify.utils.highlight"), autoload("nvim-startify.utils.index")
 do end (_2amodule_locals_2a)["builtin"] = builtin
 _2amodule_locals_2a["config"] = config
 _2amodule_locals_2a["file"] = file
+_2amodule_locals_2a["highlight"] = highlight
 _2amodule_locals_2a["index"] = index
 local function skip_line_3f()
   return "Returns true if we can skip a line and continue looping"
@@ -87,7 +88,43 @@ local function list_ify_loop(buffer, ify)
   end
 end
 _2amodule_2a["list-ify-loop"] = list_ify_loop
-local function art_ify_loop(buffer, art_ify)
+local function art_loop(buffer, ify, format)
+  local height = ify.size[2]
+  for i = 1, height do
+    file["add-string-line"](buffer, highlight.str(ify.string[i], "art"), file.startify["current-line"], format, ify.size[1])
+    file.startify["current-line"] = (file.startify["current-line"] + 1)
+  end
+  return nil
+end
+_2amodule_2a["art-loop"] = art_loop
+local function art_ify_loop(buffer, ify)
+  local ify_format
+  local _12_
+  do
+    local t_11_ = ify
+    if (nil ~= t_11_) then
+      t_11_ = (t_11_).format
+    else
+    end
+    _12_ = t_11_
+  end
+  if _12_ then
+    ify_format = ify.format
+  else
+    ify_format = {}
+  end
+  local merged_format = vim.tbl_extend("keep", ify_format, config.opts.format)
+  if merged_format["above-spacing"] then
+    file.startify["current-line"] = (file.startify["current-line"] + merged_format["above-spacing"])
+  else
+  end
+  art_loop(buffer, ify, merged_format)
+  if merged_format["below-spacing"] then
+    file.startify["current-line"] = (file.startify["current-line"] + merged_format["below-spacing"])
+    return nil
+  else
+    return nil
+  end
 end
 _2amodule_2a["art-ify-loop"] = art_ify_loop
 local function ify_loop(buffer, to_ify)
@@ -98,12 +135,12 @@ local function ify_loop(buffer, to_ify)
     ify = to_ify[1]
   end
   local ify_type = to_ify[2]
-  local _12_ = ify_type
-  if (_12_ == "title") then
+  local _18_ = ify_type
+  if (_18_ == "title") then
     return title_ify_loop(buffer, ify)
-  elseif (_12_ == "list") then
+  elseif (_18_ == "list") then
     return list_ify_loop(buffer, ify)
-  elseif (_12_ == "art") then
+  elseif (_18_ == "art") then
     return art_ify_loop(buffer, ify)
   else
     return nil
