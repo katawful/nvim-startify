@@ -235,11 +235,15 @@ Returns whitespace string"
 ;;; @keymap: String -- the keys to present
 ;;; @content: String -- the line that needs to be added
 ;;; @format: Text format table
-(defn pad-key-string [keymap content format] "Pad a key string
+;;; @typer: String -- the type of entry
+;;; @index: Number -- the current entry index
+(defn pad-key-string [keymap content format typer index] "Pad a key string
 This will align the key string with the left page or window only
 @keymap: String -- the keys to present
 @content: String -- the line that needs to be added
-@format: Text format table"
+@format: Text format table
+@typer: String -- the type of entry
+@index: Number -- the current entry index"
       (let [key-string builtin.key-string
             padding (or format.padding config.opts.format.padding)
             align (or format.align config.opts.format.align)
@@ -260,6 +264,46 @@ This will align the key string with the left page or window only
             content-padding (padded-string
                               (- (alignment align content padding)
                                  keymap-length page-margin 2 padding))]
+
+        ;; TODO: make this much less ugly
+        (table.insert  (. (. (. (. startify
+                                   startify.working-buffer)
+                                :ify)
+                             startify.working-ify)
+                          :entries)
+                      {:line [startify.current-line startify.current-line]
+                       :col [(+ page-padding ; to keystring
+                                2 ; [ and ]
+                                (length (tostring keymap)) ; keymap
+                                (length content-padding) ; to content
+                                1) ; to match up to content
+                             (+ page-padding ; to keystring
+                                2 ; [ and ]
+                                (length (tostring keymap)) ; keymap
+                                (length content-padding) ; to content
+                                (length content))]}) ; content
+        (local keys-table {:line [startify.current-line startify.current-line]
+                           :col [(+ page-padding ; to keystring
+                                    1 ; first [
+                                    1) ; line up
+                                 (+ page-padding ; to keystring
+                                    1 ; first [
+                                   (length (tostring keymap)))] ; end of keymap
+                           :map (tostring keymap)})
+        (table.insert  (. (. (. (. startify
+                                   startify.working-buffer)
+                                :ify)
+                             startify.working-ify)
+                          :keys)
+                      keys-table)
+        (tset keys-table :index index)
+        (table.insert (. (. startify startify.working-buffer) :keys)
+                      keys-table)
+        (tset (. (. (. startify startify.working-buffer) :ify) startify.working-ify)
+              :type typer)
+        ;; TODO: end of the ugly
+
+
         (string.format aligned-key-string keymap content-padding content)))
 
 ;;; FN: Add a line of content to startify buffer
@@ -282,6 +326,10 @@ The full IFY implementation uses this function repeatedly
                                           (padded-string padding)
                                           content)
             pos (- pos 1)] ; nvim api is 0 index which is confusing
+        (tset (. (. (. startify buffer) :ify) startify.working-ify)
+              :line [(+ pos 1) (+ pos 1)])
+        (tset (. (. (. startify buffer) :ify) startify.working-ify)
+              :col [(+ padding 1) (+ (length content) padding)])
         (vim.api.nvim_buf_set_lines buffer
                                     pos
                                     pos
@@ -327,6 +375,8 @@ The full IFY implementation uses this function repeatedly
                                           (padded-string padding)
                                           content)
             pos (- pos 1)] ; nvim api is 0 index which is confusing
+        (tset (. (. (. startify buffer) :ify) startify.working-ify)
+              :col [(+ padding 1) (+ width padding)])
         (vim.api.nvim_buf_set_lines buffer
                                     pos
                                     pos

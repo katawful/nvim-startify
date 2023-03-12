@@ -181,6 +181,11 @@ highlighting for Neovim 0.7 and newer users
             (+ file.startify.hl-group 1)
             out))))
 
+;;; FN: get the current possible generated hl-group
+(defn get-hl-group [ify]
+      (when file.startify.hl-group
+        (string.format "Startify_%s_%s" ify file.startify.hl-group)))
+
 ;;; FN: Highlight any conjoined-color-string-tables and return the string line
 ;;; Each index of an art IFY's string key is a line to print
 ;;; There can be an unlimited number of CCST in each index

@@ -22,6 +22,9 @@
             merged-format (vim.tbl_extend :keep
                                          ify-format
                                          config.opts.format)]
+        (table.insert (. (. file.startify buffer) :ify)
+                      {:id file.startify.working-ify
+                       :ify :title})
         (when merged-format.above-spacing
           (set file.startify.current-line
                (+ file.startify.current-line
@@ -44,12 +47,18 @@
       (let [entries-length (length ify.entries)
             names (if ify.names ify.names
                     ify.entries)]
+        (tset (. (. (. file.startify buffer) :ify) file.startify.working-ify)
+              :entries [])
+        (tset (. (. (. file.startify buffer) :ify) file.startify.working-ify)
+              :keys [])
         (for [i 1 entries-length]
           (file.add-entry-line buffer
                                (file.pad-key-string
                                  (index.get-next buffer)
                                  (. names i)
-                                 format)
+                                 format
+                                 (. ify :type)
+                                 i)
                                file.startify.current-line
                                format)
           (set file.startify.current-line (+ file.startify.current-line 1)))))
@@ -62,6 +71,10 @@
             merged-format (vim.tbl_extend :keep
                                           ify-format
                                           config.opts.format)]
+        (table.insert (. (. file.startify buffer) :ify)
+                      {:id file.startify.working-ify
+                       :ify :list
+                       :type (. ify :type)})
         (when merged-format.above-spacing
           (set file.startify.current-line
                (+ file.startify.current-line
@@ -78,6 +91,9 @@
 ;;; @format: Key/val -- the format table already created
 (defn art-loop [buffer ify format]
       (let [height (. ify.size 2)]
+        (tset (. (. (. file.startify buffer) :ify) file.startify.working-ify)
+              :line [file.startify.current-line (+ file.startify.current-line
+                                                   (. ify.size 2))])
         (for [i 1 height]
           (file.add-string-line buffer
                                 (highlight.str (. ify.string i) :art)
@@ -94,6 +110,9 @@
             merged-format (vim.tbl_extend :keep
                                           ify-format
                                           config.opts.format)]
+        (table.insert (. (. file.startify buffer) :ify)
+                      {:id file.startify.working-ify
+                       :ify :art})
         (when merged-format.above-spacing
           (set file.startify.current-line
                (+ file.startify.current-line
@@ -103,6 +122,7 @@
           (set file.startify.current-line
                (+ file.startify.current-line
                   merged-format.below-spacing)))))
+
 
 ;;; FN: Loop through a group
 ;;; @buffer: Number -- represents a buffer
@@ -125,4 +145,6 @@
       (let [ifys config.opts.render-order
             ifys-length (length ifys)]
         (for [i 1 ifys-length]
-          (ify-loop buffer (. ifys i)))))
+          (ify-loop buffer (. ifys i))
+          (set file.startify.working-ify
+                (+ file.startify.working-ify 1)))))
