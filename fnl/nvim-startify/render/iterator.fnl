@@ -22,22 +22,17 @@
             merged-format (vim.tbl_extend :keep
                                          ify-format
                                          config.opts.format)]
-        (table.insert (. (. file.startify buffer) :ify)
-                      {:id file.startify.working-ify
-                       :ify :title})
+        (data.insert-ify-value {:id file.startify.working-ify
+                                :ify :title})
         (when merged-format.above-spacing
-          (set file.startify.current-line
-               (+ file.startify.current-line
-                  merged-format.above-spacing)))
+          (data.inc-cur-line merged-format.above-spacing))
         (file.add-line buffer
                        ify.string
                        file.startify.current-line
                        merged-format)
-        (set file.startify.current-line (+ file.startify.current-line 1))
+        (data.inc-cur-line 1)
         (when merged-format.below-spacing
-          (set file.startify.current-line
-               (+ file.startify.current-line
-                  merged-format.below-spacing)))))
+          (data.inc-cur-line merged-format.below-spacing))))
 
 ;;; FN: loop through the entries key in a list IFY
 ;;; @buffer: Number -- represents a buffer
@@ -47,10 +42,8 @@
       (let [entries-length (length ify.entries)
             names (if ify.names ify.names
                     ify.entries)]
-        (tset (. (. (. file.startify buffer) :ify) file.startify.working-ify)
-              :entries [])
-        (tset (. (. (. file.startify buffer) :ify) file.startify.working-ify)
-              :keys [])
+        (data.set-ify-value file.startify.working-ify :entries [])
+        (data.set-ify-value file.startify.working-ify :keys [])
         (for [i 1 entries-length]
           (file.add-entry-line buffer
                                (file.pad-key-string
@@ -61,7 +54,7 @@
                                  i)
                                file.startify.current-line
                                format)
-          (set file.startify.current-line (+ file.startify.current-line 1)))))
+          (data.inc-cur-line 1))))
 
 ;;; FN: loop through a list IFY
 ;;; @buffer: Number -- represents a buffer
@@ -76,14 +69,10 @@
                        :ify :list
                        :type (. ify :type)})
         (when merged-format.above-spacing
-          (set file.startify.current-line
-               (+ file.startify.current-line
-                  merged-format.above-spacing)))
+          (data.inc-cur-line merged-format.above-spacing))
         (entries-loop buffer ify merged-format)
         (when merged-format.below-spacing
-          (set file.startify.current-line
-               (+ file.startify.current-line
-                  merged-format.below-spacing)))))
+          (data.inc-cur-line merged-format.below-spacing))))
 
 ;;; FN: loop through the entries key in a art IFY
 ;;; @buffer: Number -- represents a buffer
@@ -91,16 +80,17 @@
 ;;; @format: Key/val -- the format table already created
 (defn art-loop [buffer ify format]
       (let [height (. ify.size 2)]
-        (tset (. (. (. file.startify buffer) :ify) file.startify.working-ify)
-              :line [file.startify.current-line (+ file.startify.current-line
-                                                   (. ify.size 2))])
+        (data.set-ify-value file.startify.working-ify
+                            :line [file.startify.current-line
+                                   (+ file.startify.current-line
+                                      (. ify.size 2))])
         (for [i 1 height]
           (file.add-string-line buffer
-                                (highlight.str (. ify.string i) :art)
+                                (. ify.string i)
                                 file.startify.current-line
                                 format
                                 (. ify.size 1))
-          (set file.startify.current-line (+ file.startify.current-line 1)))))
+          (data.inc-cur-line 1))))
 
 ;;; FN: loop through a art IFY
 ;;; @buffer: Number -- represents a buffer
@@ -114,14 +104,10 @@
                       {:id file.startify.working-ify
                        :ify :art})
         (when merged-format.above-spacing
-          (set file.startify.current-line
-               (+ file.startify.current-line
-                  merged-format.above-spacing)))
+          (data.inc-cur-line merged-format.above-spacing))
         (art-loop buffer ify merged-format)
         (when merged-format.below-spacing
-          (set file.startify.current-line
-               (+ file.startify.current-line
-                  merged-format.below-spacing)))))
+          (data.inc-cur-line merged-format.below-spacing))))
 
 
 ;;; FN: Loop through a group

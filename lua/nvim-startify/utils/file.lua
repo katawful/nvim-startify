@@ -11,10 +11,12 @@ do
   _2amodule_locals_2a = (_2amodule_2a)["aniseed/locals"]
 end
 local autoload = (require("nvim-startify.aniseed.autoload")).autoload
-local a, builtin, config, fortune, _, _0 = autoload("nvim-startify.aniseed.core"), autoload("nvim-startify.render.builtins"), autoload("nvim-startify.utils.config"), autoload("nvim-startify.fortune.init"), nil, nil
+local a, builtin, config, data, ext, fortune, _, _0 = autoload("nvim-startify.aniseed.core"), autoload("nvim-startify.render.builtins"), autoload("nvim-startify.utils.config"), autoload("nvim-startify.utils.data"), autoload("nvim-startify.utils.extmark"), autoload("nvim-startify.fortune.init"), nil, nil
 _2amodule_locals_2a["a"] = a
 _2amodule_locals_2a["builtin"] = builtin
 _2amodule_locals_2a["config"] = config
+_2amodule_locals_2a["data"] = data
+_2amodule_locals_2a["ext"] = ext
 _2amodule_locals_2a["fortune"] = fortune
 _2amodule_locals_2a["_"] = _0
 _2amodule_locals_2a["_"] = _0
@@ -255,7 +257,7 @@ local function padded_string(amount)
   return str
 end
 _2amodule_2a["padded-string"] = padded_string
-local function pad_key_string(keymap, content, format)
+local function pad_key_string(keymap, content, format, typer, index)
   local key_string = builtin["key-string"]
   local padding = (format.padding or config.opts.format.padding)
   local align = (format.align or config.opts.format.align)
@@ -282,6 +284,12 @@ local function pad_key_string(keymap, content, format)
   end
   local keymap_length = string.len(tostring(keymap))
   local content_padding = padded_string((alignment(align, content, padding) - keymap_length - page_margin - 2 - padding))
+  local line = {startify["current-line"], startify["current-line"]}
+  local content_col = {(page_padding + 2 + #tostring(keymap) + #content_padding + 1), (page_padding + 2 + #tostring(keymap) + #content_padding + #content)}
+  local key_col = {(page_padding + 1 + 1), (page_padding + 1 + #tostring(keymap))}
+  data["insert-entry"]({line = line, col = content_col, ext = ext.add(startify["working-buffer"], line, content_col, nil)})
+  data["insert-key"]({line = {startify["current-line"], startify["current-line"]}, col = key_col, map = tostring(keymap), ext = ext.add(startify["working-buffer"], line, key_col, nil)}, index)
+  data["set-ify-value"](startify["working-ify"], "type", typer)
   return string.format(aligned_key_string, keymap, content_padding, content)
 end
 _2amodule_2a["pad-key-string"] = pad_key_string
@@ -303,6 +311,10 @@ local function add_line(buffer, content, pos, format)
   padding = alignment(align, content, _37_())
   local padded_content = string.format("%s%s", padded_string(padding), content)
   local pos0 = (pos - 1)
+  local col = {(padding + 1), (#content + padding)}
+  data["set-ify-value"](startify["working-ify"], "line", {(pos0 + 1), (pos0 + 1)})
+  data["set-ify-value"](startify["working-ify"], "col", col)
+  data["set-ify-value"](startify["working-ify"], "ext", ext.add(buffer, {pos0, pos0}, col, nil))
   return vim.api.nvim_buf_set_lines(buffer, pos0, pos0, false, {padded_content})
 end
 _2amodule_2a["add-line"] = add_line
@@ -316,6 +328,7 @@ local function add_string_line(buffer, content, pos, format, width)
   local padding = alignment(align, padded_string(width), (format.padding or config.opts.format.padding))
   local padded_content = string.format("%s%s", padded_string(padding), content)
   local pos0 = (pos - 1)
+  data["set-ify-value"](startify["working-ify"], "col", {(padding + 1), (width + padding)})
   return vim.api.nvim_buf_set_lines(buffer, pos0, pos0, false, {padded_content})
 end
 _2amodule_2a["add-string-line"] = add_string_line

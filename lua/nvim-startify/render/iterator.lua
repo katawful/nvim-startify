@@ -29,6 +29,7 @@ local function title_ify_loop(buffer, ify)
     ify_format = {}
   end
   local merged_format = vim.tbl_extend("keep", ify_format, config.opts.format)
+  table.insert(file.startify[buffer].ify, {id = file.startify["working-ify"], ify = "title"})
   if merged_format["above-spacing"] then
     file.startify["current-line"] = (file.startify["current-line"] + merged_format["above-spacing"])
   else
@@ -51,8 +52,10 @@ local function entries_loop(buffer, ify, format)
   else
     names = ify.entries
   end
+  file.startify[buffer].ify[file.startify["working-ify"]]["entries"] = {}
+  file.startify[buffer].ify[file.startify["working-ify"]]["keys"] = {}
   for i = 1, entries_length do
-    file["add-entry-line"](buffer, file["pad-key-string"](index["get-next"](buffer), names[i], format), file.startify["current-line"], format)
+    file["add-entry-line"](buffer, file["pad-key-string"](index["get-next"](buffer), names[i], format, ify.type, i), file.startify["current-line"], format)
     file.startify["current-line"] = (file.startify["current-line"] + 1)
   end
   return nil
@@ -75,6 +78,7 @@ local function list_ify_loop(buffer, ify)
     ify_format = {}
   end
   local merged_format = vim.tbl_extend("keep", ify_format, config.opts.format)
+  table.insert(file.startify[buffer].ify, {id = file.startify["working-ify"], ify = "list", type = ify.type})
   if merged_format["above-spacing"] then
     file.startify["current-line"] = (file.startify["current-line"] + merged_format["above-spacing"])
   else
@@ -90,6 +94,7 @@ end
 _2amodule_2a["list-ify-loop"] = list_ify_loop
 local function art_loop(buffer, ify, format)
   local height = ify.size[2]
+  file.startify[buffer].ify[file.startify["working-ify"]]["line"] = {file.startify["current-line"], (file.startify["current-line"] + ify.size[2])}
   for i = 1, height do
     file["add-string-line"](buffer, highlight.str(ify.string[i], "art"), file.startify["current-line"], format, ify.size[1])
     file.startify["current-line"] = (file.startify["current-line"] + 1)
@@ -114,6 +119,7 @@ local function art_ify_loop(buffer, ify)
     ify_format = {}
   end
   local merged_format = vim.tbl_extend("keep", ify_format, config.opts.format)
+  table.insert(file.startify[buffer].ify, {id = file.startify["working-ify"], ify = "art"})
   if merged_format["above-spacing"] then
     file.startify["current-line"] = (file.startify["current-line"] + merged_format["above-spacing"])
   else
@@ -153,6 +159,7 @@ local function loop(buffer)
   local ifys_length = #ifys
   for i = 1, ifys_length do
     ify_loop(buffer, ifys[i])
+    file.startify["working-ify"] = (file.startify["working-ify"] + 1)
   end
   return nil
 end
