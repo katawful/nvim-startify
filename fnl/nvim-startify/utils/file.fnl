@@ -1,6 +1,7 @@
 (module nvim-startify.utils.file
         {autoload {a nvim-startify.aniseed.core
                    ext nvim-startify.utils.extmark
+                   high nvim-startify.utils.highlight
                    config nvim-startify.utils.config
                    data nvim-startify.utils.data
                    builtin nvim-startify.render.builtins
@@ -325,8 +326,7 @@ The full IFY implementation uses this function repeatedly
             col [(+ padding 1) (+ (length content) padding)]]
         (data.set-ify-value startify.working-ify :line [(+ pos 1) (+ pos 1)])
         (data.set-ify-value startify.working-ify :col col)
-        (data.set-ify-value startify.working-ify
-                            :ext (ext.add buffer
+        (data.insert-ify-extmark (ext.add buffer
                                           [pos pos]
                                           col
                                           nil))
@@ -368,20 +368,61 @@ The full IFY implementation uses this function repeatedly
 @buffer: Number -- represents a buffer
 @contents: String -- a single line of text to add to file
 @format: Key/val -- a formatting table"
-      (let [align (or format.align config.opts.format.align)
-            padding (alignment align (padded-string width)
-                               (or format.padding config.opts.format.padding))
-            padded-content (string.format "%s%s"
-                                          (padded-string padding)
-                                          content)
-            pos (- pos 1)] ; nvim api is 0 index which is confusing
-        (data.set-ify-value startify.working-ify
-                            :col [(+ padding 1) (+ width padding)])
-        (vim.api.nvim_buf_set_lines buffer
-                                    pos
-                                    pos
-                                    false
-                                    [padded-content])))
+      (if (= (type content) :table)
+        (let [align (or format.align config.opts.format.align)
+              combined-content (do (var str "")
+                                 (each [_ v (ipairs content)]
+                                   (if (= (type v) :table)
+                                     (set str (.. str (. v 1)))
+                                     (set str (.. str v))))
+                                 str)
+              padding (alignment align (padded-string width)
+                                 (or format.padding config.opts.format.padding))
+              padded-content (string.format "%s%s"
+                                            (padded-string padding)
+                                            combined-content)
+              pos (- pos 1)] ; nvim api is 0 index which is confusing
+          (var str-length 0)
+          (data.set-ify-value startify.working-ify
+                              :col [(+ padding 1) (+ width padding)])
+          (vim.api.nvim_buf_set_lines buffer
+                                      pos
+                                      pos
+                                      false
+                                      [padded-content])
+          (each [_ v (ipairs content)]
+            ;; Handle CCST
+            (if (= (type v) :table)
+              (let [hl-group (high.gen-hl-group :art)
+                    color-table (. v 2)]
+                (tset color-table :group hl-group)
+                (high.highlight startify.namespace color-table)
+                (data.insert-ify-extmark (ext.add startify.working-buffer
+                                                  [startify.current-line
+                                                   startify.current-line]
+                                                  [(+ padding
+                                                      str-length)
+                                                   (+ padding
+                                                      str-length
+                                                      (string.len (. v 1)))]
+                                                  hl-group
+                                                  102))
+                (set str-length (+ str-length (string.len (. v 1)))))
+              (set str-length (+ str-length (string.len v))))))
+        (let [align (or format.align config.opts.format.align)
+              padding (alignment align (padded-string width)
+                                 (or format.padding config.opts.format.padding))
+              padded-content (string.format "%s%s"
+                                            (padded-string padding)
+                                            content)
+              pos (- pos 1)] ; nvim api is 0 index which is confusing
+          (data.set-ify-value startify.working-ify
+                              :col [(+ padding 1) (+ width padding)])
+          (vim.api.nvim_buf_set_lines buffer
+                                      pos
+                                      pos
+                                      false
+                                      [padded-content]))))
 
 ;;; FN: Grab the most recent files
 ;;; @file-number: Number -- the amount of recent files to return

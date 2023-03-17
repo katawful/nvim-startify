@@ -119,6 +119,8 @@
 highlighting for Neovim 0.7 and newer users
 @namespace: Number -- the extmark namespace
 @opts: Key/val -- highlight table"
+      ;; Set the namespace to the one we are using
+      (vim.api.nvim_set_hl_ns file.startify.namespace)
       ;; For now assume that a group that has a link will simply be empty otherwise
       (if (get-link opts)
           (let [group (get-group opts)
@@ -173,12 +175,12 @@ highlighting for Neovim 0.7 and newer users
       (if file.startify.hl-group
         (do
           (let [out (string.format "Startify_%s_%s" ify file.startify.hl-group)]
-            (+ file.startify.hl-group 1)
+            (set file.startify.hl-group (+ file.startify.hl-group 1))
             out))
         (do
           (set file.startify.hl-group 1)
           (let [out (string.format "Startify_%s_%s" ify file.startify.hl-group)]
-            (+ file.startify.hl-group 1)
+            (set file.startify.hl-group (+ file.startify.hl-group 1))
             out))))
 
 ;;; FN: get the current possible generated hl-group

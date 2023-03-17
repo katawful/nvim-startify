@@ -1,6 +1,8 @@
 (module nvim-startify.render.iterator
         {autoload {file nvim-startify.utils.file
-                   highlight nvim-startify.utils.highlight
+                   high nvim-startify.utils.highlight
+                   ext nvim-startify.utils.extmark
+                   data nvim-startify.utils.data
                    config nvim-startify.utils.config
                    index nvim-startify.utils.index
                    builtin nvim-startify.render.builtins}})
@@ -22,7 +24,7 @@
             merged-format (vim.tbl_extend :keep
                                          ify-format
                                          config.opts.format)]
-        (data.insert-ify-value {:id file.startify.working-ify
+        (data.insert-ify-entry {:id file.startify.working-ify
                                 :ify :title})
         (when merged-format.above-spacing
           (data.inc-cur-line merged-format.above-spacing))
@@ -30,6 +32,22 @@
                        ify.string
                        file.startify.current-line
                        merged-format)
+
+        ;; Deal with color table that might exist
+        (when ify.color
+          (let [hl-group (high.gen-hl-group :art)
+                color-table ify.color
+                ify-line (data.get-ify-value file.startify.working-ify :line)
+                ify-col (data.get-ify-value file.startify.working-ify :col)]
+            (tset color-table :group hl-group)
+            (high.highlight file.startify.namespace color-table)
+            ;; We need to highlight each line to not have runover
+            (data.insert-ify-extmark (ext.add file.startify.working-buffer
+                                              [(. ify-line 1) (. ify-line 2)]
+                                              [(. ify-col 1) (. ify-col 2)]
+                                              hl-group
+                                              101))))
+
         (data.inc-cur-line 1)
         (when merged-format.below-spacing
           (data.inc-cur-line merged-format.below-spacing))))
@@ -64,10 +82,9 @@
             merged-format (vim.tbl_extend :keep
                                           ify-format
                                           config.opts.format)]
-        (table.insert (. (. file.startify buffer) :ify)
-                      {:id file.startify.working-ify
-                       :ify :list
-                       :type (. ify :type)})
+        (data.insert-ify-entry {:id file.startify.working-ify
+                                :ify :list
+                                :type (. ify :type)})
         (when merged-format.above-spacing
           (data.inc-cur-line merged-format.above-spacing))
         (entries-loop buffer ify merged-format)
@@ -90,7 +107,23 @@
                                 file.startify.current-line
                                 format
                                 (. ify.size 1))
-          (data.inc-cur-line 1))))
+          (data.inc-cur-line 1))
+
+        ;; Deal with color table that might exist
+        (when ify.color
+          (let [hl-group (high.gen-hl-group :art)
+                color-table ify.color
+                ify-line (data.get-ify-value file.startify.working-ify :line)
+                ify-col (data.get-ify-value file.startify.working-ify :col)]
+            (tset color-table :group hl-group)
+            (high.highlight file.startify.namespace color-table)
+            ;; We need to highlight each line to not have runover
+            (for [i (. ify-line 1) (. ify-line 2)]
+              (data.insert-ify-extmark (ext.add file.startify.working-buffer
+                                                [i i]
+                                                [(. ify-col 1) (. ify-col 2)]
+                                                hl-group
+                                                101)))))))
 
 ;;; FN: loop through a art IFY
 ;;; @buffer: Number -- represents a buffer
@@ -100,9 +133,8 @@
             merged-format (vim.tbl_extend :keep
                                           ify-format
                                           config.opts.format)]
-        (table.insert (. (. file.startify buffer) :ify)
-                      {:id file.startify.working-ify
-                       :ify :art})
+        (data.insert-ify-entry {:id file.startify.working-ify
+                                :ify :art})
         (when merged-format.above-spacing
           (data.inc-cur-line merged-format.above-spacing))
         (art-loop buffer ify merged-format)

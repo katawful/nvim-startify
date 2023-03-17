@@ -49,13 +49,38 @@ The keys table will duplicate for ease of use
                ify)
             key value))
 
+;;; FN: Get a value for a IFY
+;;; @ify: The index of the ify in use
+;;; @key: The key to add
+(defn get-ify-value [ify key]
+      (. (. (. (. file.startify file.startify.working-buffer)
+               :ify)
+           ify)
+         key))
+
 ;;; FN: Insert a entry for a IFY
 ;;; @entry: Key/val -- The entry to add
 (defn insert-ify-entry [entry]
-      (table.insert (. (. (. file.startify file.startify.working-buffer)
-                          :ify)
-                       ify)
+      (table.insert (. (. file.startify file.startify.working-buffer)
+                       :ify)
                     entry))
+
+;;; FN: Insert a extmark for a IFY
+;;; @entry: Key/val -- The entry to add
+(defn insert-ify-extmark [ext]
+      (when (not (. (. (. (. file.startify file.startify.working-buffer)
+                          :ify)
+                       file.startify.working-ify)
+                    :ext))
+        (tset  (. (. (. file.startify file.startify.working-buffer)
+                     :ify)
+                  file.startify.working-ify)
+              :ext []))
+      (table.insert (. (. (. (. file.startify file.startify.working-buffer)
+                             :ify)
+                         file.startify.working-ify)
+                       :ext)
+                    ext))
 
 ;;; FN: Increment current line
 ;;; @amount: Number -- amount to inc by
