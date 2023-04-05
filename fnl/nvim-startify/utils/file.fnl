@@ -236,14 +236,16 @@ Returns whitespace string"
 ;;; We will keep the keymap string at the edges of the page
 ;;; Padding on the keymap will be allowed likely
 ;;; @keymap: String -- the keys to present
-;;; @content: String -- the line that needs to be added
+;;; @entry: String -- the entry to be stored
+;;; @name: String -- the line that needs to be added
 ;;; @format: Text format table
 ;;; @typer: String -- the type of entry
 ;;; @index: Number -- the current entry index
-(defn pad-key-string [keymap content format typer index] "Pad a key string
+(defn pad-key-string [keymap entry name format typer index] "Pad a key string
 This will align the key string with the left page or window only
 @keymap: String -- the keys to present
-@content: String -- the line that needs to be added
+@entry: String -- the entry to be stored
+@name: String -- the line that needs to be added
 @format: Text format table
 @typer: String -- the type of entry
 @index: Number -- the current entry index"
@@ -264,20 +266,20 @@ This will align the key string with the left page or window only
                           (math.floor (/ (- win-width page-width) 2))
                           0)
             keymap-length (string.len (tostring keymap))
-            content-padding (padded-string
-                              (- (alignment align content padding)
+            name-padding (padded-string
+                              (- (alignment align name padding)
                                  keymap-length page-margin 2 padding))
             line [startify.current-line startify.current-line]
-            content-col [(+ page-padding ; to keystring
+            name-col [(+ page-padding ; to keystring
                            2 ; [ and ]
                            (length (tostring keymap)) ; keymap
-                           (length content-padding) ; to content
-                           1) ; to match up to content
+                           (length name-padding) ; to name
+                           1 ; to match up to name
                          (+ page-padding ; to keystring
                             2 ; [ and ]
                             (length (tostring keymap)) ; keymap
-                            (length content-padding) ; to content
-                            (length content))] ;content
+                            (length name-padding) ; to name
+                            (length name)))] ;name
             key-col [(+ page-padding ; to keystring
                         1 ; first [
                         1) ; line up
@@ -286,11 +288,13 @@ This will align the key string with the left page or window only
                        (length (tostring keymap)))]] ; end of keymap
 
         (data.insert-entry {: line
-                            :col content-col
+                            :col name-col
                             :ext (ext.add startify.working-buffer
                                           line
-                                          content-col
-                                          nil)})
+                                          name-col
+                                          nil)
+                            :entry entry
+                            :name name})
         (data.insert-key {:line [startify.current-line startify.current-line]
                           :col key-col
                           :map (tostring keymap)
@@ -301,7 +305,7 @@ This will align the key string with the left page or window only
                          index)
         (data.set-ify-value startify.working-ify :type typer)
 
-        (string.format aligned-key-string keymap content-padding content)))
+        (string.format aligned-key-string keymap name-padding name)))
 
 ;;; FN: Add a line of content to startify buffer
 ;;; @buffer: Number -- represents a buffer

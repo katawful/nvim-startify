@@ -66,6 +66,7 @@
           (file.add-entry-line buffer
                                (file.pad-key-string
                                  (index.get-next buffer)
+                                 (. ify.entries i)
                                  (. names i)
                                  format
                                  (. ify :type)
