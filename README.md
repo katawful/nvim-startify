@@ -30,3 +30,6 @@ These currently include:
 #### Release
 This is the final release.
 This will mainly target bugs and documentation.
+
+# License
+This is licensed under the MIT license.
